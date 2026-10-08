@@ -413,20 +413,6 @@ export const AdminDashboardPage: React.FC = () => {
         >
           Customer Roster ({usersList.length})
         </button>
-        <button
-          onClick={() => setActiveTab('database')}
-          className={`tap-active px-3 sm:px-4 py-2 rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5 ${
-            activeTab === 'database'
-              ? 'bg-emerald-600 text-white font-bold shadow-md shadow-emerald-600/30'
-              : 'text-emerald-400 hover:text-white hover:bg-emerald-500/10 border border-emerald-500/20'
-          }`}
-        >
-          <Database className="w-3.5 h-3.5" />
-          <span>Supabase DB</span>
-          {isSupabaseConnected && (
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse ml-0.5" />
-          )}
-        </button>
       </div>
 
       {/* 1. Overview Tab */}
