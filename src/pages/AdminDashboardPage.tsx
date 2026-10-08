@@ -342,22 +342,6 @@ export const AdminDashboardPage: React.FC = () => {
 
         <div className="flex flex-wrap items-center gap-2.5">
           <button
-            onClick={() => setActiveTab('database')}
-            className={`px-3 py-2 rounded-lg text-xs font-mono flex items-center gap-2 border transition-all ${
-              isSupabaseConnected
-                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 shadow-sm'
-                : 'bg-amber-500/10 border-amber-500/30 text-amber-400 hover:bg-amber-500/20 shadow-sm'
-            }`}
-            title="Click to manage Supabase database settings"
-          >
-            <span className={`w-2 h-2 rounded-full ${isSupabaseConnected ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
-            <Database className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">
-              {isSupabaseConnected ? 'Supabase: Active' : 'DB: Local Mode'}
-            </span>
-          </button>
-
-          <button
             onClick={handleOpenAddProduct}
             className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold uppercase tracking-wider transition-colors flex items-center gap-2 shadow-lg shadow-blue-600/20"
           >
