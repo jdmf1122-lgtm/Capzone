@@ -102,6 +102,30 @@ export const UserProfilePage: React.FC = () => {
         </div>
       </div>
 
+      {/* Admin Point of View Banner */}
+      {isAdmin && (
+        <div className="p-4 rounded-xl bg-gradient-to-r from-amber-950/50 via-[#182232] to-[#111827] border border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2 text-amber-200">
+            <Shield className="w-5 h-5 text-amber-400 shrink-0" />
+            <div>
+              <p className="font-bold text-amber-300">Admin Point of View Active</p>
+              <p className="text-[11px] text-amber-200/80 mt-0.5">
+                Purchasing and adding store items to bag is restricted for this administrator account.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => {
+              setCurrentPage('admin');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs uppercase tracking-wider rounded-lg transition-colors shrink-0"
+          >
+            Open Admin Dashboard
+          </button>
+        </div>
+      )}
+
       {/* Account Highlights */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono text-xs">
         <div

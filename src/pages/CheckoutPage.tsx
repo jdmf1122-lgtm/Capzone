@@ -11,7 +11,8 @@ import {
   Smartphone,
   Banknote,
   Lock,
-  LogIn
+  LogIn,
+  Shield
 } from 'lucide-react';
 
 import { ROXAS_BARANGAYS } from '../data/roxasBarangays';
@@ -25,10 +26,11 @@ export const CheckoutPage: React.FC = () => {
     createOrder,
     setCurrentPage,
     setIsAuthModalOpen,
-    setAuthModalReason
+    setAuthModalReason,
+    showToast
   } = useShop();
 
-  const { currentUser } = useAuth();
+  const { currentUser, switchRole } = useAuth();
 
   // Form Fields initialized from logged in user if available
   const [customerName, setCustomerName] = useState(currentUser?.fullname || '');
@@ -67,13 +69,13 @@ export const CheckoutPage: React.FC = () => {
         </div>
         <div className="space-y-2">
           <span className="text-xs font-mono uppercase tracking-widest text-amber-400 font-semibold">
-            Authentication Required · Kailangan Mag-Sign In
+            Authentication Required · Sign In First
           </span>
           <h2 className="text-2xl sm:text-3xl font-extrabold font-['Syne'] text-white">
-            Hindi Makakapag-Order Hanggat Hindi Naka-Sign In O Register
+            Please Sign In to Complete Your Order
           </h2>
           <p className="text-xs sm:text-sm text-gray-400 max-w-md mx-auto leading-relaxed">
-            Upang ma-proseso ang inyong order at Roxas Local Rider delivery o Studio Pickup, kinakailangang mag-sign in gamit ang inyong account o mag-rehistro muna.
+            To process your order for Roxas Local Delivery or Poblacion Studio Pickup, please sign in with your account or create a new one.
           </p>
         </div>
 
@@ -86,13 +88,57 @@ export const CheckoutPage: React.FC = () => {
             className="flex-1 py-3 px-5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-colors shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2"
           >
             <LogIn className="w-4 h-4" />
-            <span>Sign In o Mag-Register</span>
+            <span>Sign In / Register</span>
           </button>
           <button
             onClick={() => setCurrentPage('shop')}
             className="py-3 px-5 bg-white/5 hover:bg-white/10 text-gray-300 rounded-xl text-xs font-medium uppercase tracking-wider transition-colors border border-white/10"
           >
-            Bumalik sa Tindahan
+            Back to Catalog
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Admin Point of View check: Admins cannot purchase their own products
+  if (currentUser?.role === 'admin') {
+    return (
+      <div className="max-w-xl mx-auto px-4 py-20 text-center space-y-6">
+        <div className="w-16 h-16 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto shadow-xl shadow-amber-500/10">
+          <Shield className="w-8 h-8" />
+        </div>
+        <div className="space-y-2">
+          <span className="text-xs font-mono uppercase tracking-widest text-amber-400 font-semibold">
+            Admin Point of View · Store Owner
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-extrabold font-['Syne'] text-white">
+            Administrators Cannot Purchase Store Products
+          </h2>
+          <p className="text-xs sm:text-sm text-gray-400 max-w-md mx-auto leading-relaxed">
+            You are logged in as a store administrator. Administrators cannot purchase their own inventory or submit checkout orders. To test the customer checkout flow, please switch to a customer account.
+          </p>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2 max-w-md mx-auto">
+          <button
+            onClick={() => {
+              setCurrentPage('admin');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className="flex-1 py-3 px-5 bg-amber-500 hover:bg-amber-400 text-black rounded-xl text-xs font-bold uppercase tracking-wider transition-colors shadow-lg shadow-amber-950/40 flex items-center justify-center gap-2"
+          >
+            <Shield className="w-4 h-4" />
+            <span>Go to Admin Dashboard</span>
+          </button>
+          <button
+            onClick={() => {
+              switchRole('user');
+              showToast('Switched to customer account. You can now test customer checkout.', 'info');
+            }}
+            className="py-3 px-5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-medium uppercase tracking-wider transition-colors border border-white/10"
+          >
+            Switch to Customer View
           </button>
         </div>
       </div>
@@ -116,6 +162,10 @@ export const CheckoutPage: React.FC = () => {
 
   const handleSubmitOrder = (e: React.FormEvent) => {
     e.preventDefault();
+    if (currentUser?.role === 'admin') {
+      showToast('Admin restriction: Store administrators cannot place orders.', 'error');
+      return;
+    }
     setSubmitting(true);
 
     const finalAddress =
@@ -500,7 +550,7 @@ export const CheckoutPage: React.FC = () => {
                     <img
                       src={item.image}
                       alt={item.name}
-                      className="w-12 h-12 object-cover rounded-lg bg-black/40 border border-white/10 shrink-0"
+                      className="w-12 h-12 object-contain p-0.5 rounded-lg bg-black/40 border border-white/10 shrink-0"
                     />
                     <div className="min-w-0">
                       <p className="font-semibold text-white truncate">{item.name}</p>

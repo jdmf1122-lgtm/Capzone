@@ -198,7 +198,20 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [products, setProducts] = useState<Product[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.PRODUCTS);
-      return saved ? JSON.parse(saved) : INITIAL_PRODUCTS;
+      if (!saved) return INITIAL_PRODUCTS;
+      const parsed: Product[] = JSON.parse(saved);
+      // Ensure real asset images are used even if browser previously cached old URLs
+      return parsed.map((p) => {
+        const initialMatch = INITIAL_PRODUCTS.find((init) => init.id === p.id);
+        if (initialMatch && (!p.image || p.image.includes('unsplash.com') || p.image.includes('/@fs/'))) {
+          return {
+            ...p,
+            image: initialMatch.image,
+            gallery: initialMatch.gallery
+          };
+        }
+        return p;
+      });
     } catch {
       return INITIAL_PRODUCTS;
     }
@@ -216,7 +229,18 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [categories, setCategories] = useState<CategoryInfo[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.CATEGORIES);
-      return saved ? JSON.parse(saved) : INITIAL_CATEGORIES;
+      if (!saved) return INITIAL_CATEGORIES;
+      const parsed: CategoryInfo[] = JSON.parse(saved);
+      return parsed.map((c) => {
+        const initialMatch = INITIAL_CATEGORIES.find((init) => init.id === c.id);
+        if (initialMatch && (!c.image || c.image.includes('unsplash.com') || c.image.includes('/@fs/'))) {
+          return {
+            ...c,
+            image: initialMatch.image
+          };
+        }
+        return c;
+      });
     } catch {
       return INITIAL_CATEGORIES;
     }
@@ -450,8 +474,13 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Cart operations
   const addToCart = (product: Product, colorName?: string, quantity: number = 1) => {
+    if (currentUser?.role === 'admin') {
+      showToast('Admin View: Store administrators cannot purchase store products or add items to bag.', 'error');
+      return;
+    }
+
     if (!currentUser) {
-      showToast('Kailangan munang mag-sign in o mag-register bago mag-add to cart.', 'error');
+      showToast('Please sign in or create an account before adding items to bag.', 'error');
       setPendingAuthAction({ type: 'addToCart', product, colorName, quantity });
       setAuthModalReason('cart');
       setIsAuthModalOpen(true);
@@ -465,8 +494,13 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const buyNow = (product: Product, colorName?: string, quantity: number = 1) => {
+    if (currentUser?.role === 'admin') {
+      showToast('Admin View: Store administrators cannot purchase store products.', 'error');
+      return;
+    }
+
     if (!currentUser) {
-      showToast('Kailangan munang mag-sign in o mag-register bago umorder.', 'error');
+      showToast('Please sign in or create an account before placing an order.', 'error');
       setPendingAuthAction({ type: 'buyNow', product, colorName, quantity });
       setAuthModalReason('order');
       setIsAuthModalOpen(true);
@@ -480,6 +514,14 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const executePendingAuthAction = () => {
+    if (currentUser?.role === 'admin') {
+      showToast('Logged in as Administrator. Purchase action disabled for admin account.', 'info');
+      setPendingAuthAction(null);
+      setIsAuthModalOpen(false);
+      setAuthModalReason(null);
+      return;
+    }
+
     if (pendingAuthAction) {
       const { type, product, colorName, quantity } = pendingAuthAction;
       addItemToCartInternal(product, colorName, quantity);
@@ -487,10 +529,10 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIsCartOpen(false);
         setCurrentPage('checkout');
         window.scrollTo({ top: 0, behavior: 'smooth' });
-        showToast(`Welcome! Papunta na sa checkout para sa ${product.name}...`, 'success');
+        showToast(`Welcome! Proceeding to checkout for ${product.name}...`, 'success');
       } else {
         setIsCartOpen(true);
-        showToast(`Naidagdag ang ${quantity}x "${product.name}" sa iyong bag!`, 'success');
+        showToast(`Added ${quantity}x "${product.name}" to your bag!`, 'success');
       }
       setPendingAuthAction(null);
     } else if (authModalReason === 'checkout') {
@@ -684,8 +726,13 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Order operations
   const createOrder = (payload: CreateOrderPayload): Order => {
+    if (currentUser?.role === 'admin') {
+      showToast('Admin restriction: Store administrators cannot place customer orders.', 'error');
+      throw new Error('Store administrators cannot place orders.');
+    }
+
     if (!currentUser) {
-      showToast('Kailangan munang mag-sign in o mag-register bago makapag-order.', 'error');
+      showToast('Please sign in or create an account before placing an order.', 'error');
       setAuthModalReason('order');
       setIsAuthModalOpen(true);
       throw new Error('Authentication required to place order.');

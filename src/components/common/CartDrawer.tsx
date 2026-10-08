@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useShop } from '../../context/ShopContext';
 import { useAuth } from '../../context/AuthContext';
-import { X, Trash2, Plus, Minus, ArrowRight, Tag, ShieldCheck, Truck } from 'lucide-react';
+import { X, Trash2, Plus, Minus, ArrowRight, Tag, ShieldCheck, Truck, Shield, ShieldAlert } from 'lucide-react';
 
 export const CartDrawer: React.FC = () => {
   const { currentUser } = useAuth();
@@ -47,8 +47,13 @@ export const CartDrawer: React.FC = () => {
   };
 
   const handleGoToCheckout = () => {
+    if (currentUser?.role === 'admin') {
+      showToast('Admin restriction: Store administrators cannot checkout orders.', 'error');
+      return;
+    }
+
     if (!currentUser) {
-      showToast('Kailangan munang mag-sign in o mag-register bago mag-checkout.', 'error');
+      showToast('Please sign in or create an account before proceeding to checkout.', 'error');
       setAuthModalReason('checkout');
       setIsAuthModalOpen(true);
       return;
@@ -146,7 +151,7 @@ export const CartDrawer: React.FC = () => {
                 <img
                   src={item.image}
                   alt={item.name}
-                  className="w-20 h-20 object-cover rounded-lg bg-black/40 shrink-0 border border-white/10"
+                  className="w-20 h-20 object-contain p-1 rounded-lg bg-black/40 shrink-0 border border-white/10"
                 />
                 <div className="flex-1 min-w-0 flex flex-col justify-between">
                   <div>
@@ -197,7 +202,7 @@ export const CartDrawer: React.FC = () => {
 
         {/* Footer & Checkout Area */}
         {cart.length > 0 && (
-          <div className="p-5 border-t border-white/10 bg-[#0B0F17] space-y-4">
+          <div className="p-5 pb-[max(env(safe-area-inset-bottom,0px),20px)] border-t border-white/10 bg-[#0B0F17] space-y-4">
             {/* Promo Code Input */}
             <form onSubmit={handleApplyCoupon} className="flex gap-2">
               <input
@@ -209,7 +214,7 @@ export const CartDrawer: React.FC = () => {
               />
               <button
                 type="submit"
-                className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-semibold tracking-wider uppercase transition-colors whitespace-nowrap"
+                className="tap-active px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-semibold tracking-wider uppercase transition-colors whitespace-nowrap"
               >
                 Apply
               </button>
@@ -263,16 +268,42 @@ export const CartDrawer: React.FC = () => {
 
             {/* CTAs */}
             <div className="flex flex-col gap-2">
-              <button
-                onClick={handleGoToCheckout}
-                className="w-full flex items-center justify-center gap-2 py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs uppercase tracking-wider rounded-lg transition-colors shadow-lg shadow-blue-600/20"
-              >
-                <span>Proceed to Checkout</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
+              {currentUser?.role === 'admin' ? (
+                <div className="space-y-2">
+                  <div className="p-3 bg-amber-950/60 border border-amber-500/30 rounded-xl text-xs text-amber-200 flex items-start gap-2">
+                    <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-bold text-amber-300">Admin Point of View</p>
+                      <p className="text-[11px] text-amber-200/80 mt-0.5">
+                        Store administrators cannot checkout or buy store products.
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      setIsCartOpen(false);
+                      setCurrentPage('admin');
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className="tap-active w-full flex items-center justify-center gap-2 py-3.5 bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs uppercase tracking-wider rounded-xl transition-colors shadow-lg shadow-amber-950/40"
+                  >
+                    <Shield className="w-4 h-4" />
+                    <span>Go to Admin Dashboard</span>
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={handleGoToCheckout}
+                  className="tap-active w-full flex items-center justify-center gap-2 py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs uppercase tracking-wider rounded-xl transition-colors shadow-lg shadow-blue-600/20"
+                >
+                  <span>Proceed to Checkout</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              )}
               <button
                 onClick={handleGoToFullCart}
-                className="w-full py-2 bg-transparent hover:bg-white/5 text-gray-300 text-xs font-semibold tracking-wider uppercase rounded-lg transition-colors"
+                className="tap-active w-full py-2 bg-transparent hover:bg-white/5 text-gray-300 text-xs font-semibold tracking-wider uppercase rounded-xl transition-colors"
               >
                 View Full Bag & Calculator
               </button>

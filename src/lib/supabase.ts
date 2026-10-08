@@ -202,13 +202,19 @@ export async function testSupabaseConnection(): Promise<ConnectionTestResult> {
 // ==========================================
 
 export function mapDbProductToProduct(row: any): Product {
+  const defaultProduct = INITIAL_PRODUCTS.find((p) => p.id === row.id);
+  const resolvedImage =
+    (!row.image || row.image.includes('unsplash.com') || row.image.includes('/@fs/')) && defaultProduct
+      ? defaultProduct.image
+      : row.image;
+
   return {
     id: row.id,
     name: row.name,
     category: row.category,
     description: row.description || '',
-    image: row.image,
-    gallery: Array.isArray(row.gallery) ? row.gallery : undefined,
+    image: resolvedImage,
+    gallery: Array.isArray(row.gallery) && row.gallery.length > 0 ? row.gallery : (defaultProduct?.gallery || []),
     price: Number(row.price),
     originalPrice: row.original_price != null ? Number(row.original_price) : undefined,
     stock: Number(row.stock || 0),
@@ -253,12 +259,18 @@ export function mapProductToDbProduct(p: Product): any {
 }
 
 export function mapDbCategoryToCategory(row: any): CategoryInfo {
+  const defaultCategory = INITIAL_CATEGORIES.find((c) => c.id === row.id || c.slug === row.slug);
+  const resolvedImage =
+    (!row.image || row.image.includes('unsplash.com') || row.image.includes('/@fs/')) && defaultCategory
+      ? defaultCategory.image
+      : row.image;
+
   return {
     id: row.id,
     name: row.name,
     slug: row.slug,
     description: row.description || '',
-    image: row.image || '',
+    image: resolvedImage || '',
     itemCount: Number(row.item_count || 0)
   };
 }
@@ -459,6 +471,45 @@ export async function deleteProductInDb(productId: string): Promise<boolean> {
   } catch (e) {
     console.error('Failed to delete product in Supabase:', e);
     return false;
+  }
+}
+
+/**
+ * Uploads a product photo to Supabase Storage bucket ('product-images').
+ * Returns the public CDN URL on success, or null if storage is not configured/fails.
+ */
+export async function uploadProductImageToStorage(
+  fileOrBlob: Blob | File,
+  filename?: string
+): Promise<string | null> {
+  const client = getSupabase();
+  if (!client) return null;
+
+  try {
+    const ext = fileOrBlob.type.includes('png') ? 'png' : fileOrBlob.type.includes('webp') ? 'webp' : 'jpg';
+    const safeBase = filename ? filename.replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 30) : 'cap';
+    const filePath = `caps/${safeBase}_${Date.now()}.${ext}`;
+
+    const { error: uploadError } = await client.storage
+      .from('product-images')
+      .upload(filePath, fileOrBlob, {
+        cacheControl: '3600',
+        upsert: true
+      });
+
+    if (uploadError) {
+      console.warn('Supabase storage upload skipped/failed:', uploadError.message);
+      return null;
+    }
+
+    const { data: publicUrlData } = client.storage
+      .from('product-images')
+      .getPublicUrl(filePath);
+
+    return publicUrlData?.publicUrl || null;
+  } catch (err) {
+    console.warn('Storage upload encountered an error:', err);
+    return null;
   }
 }
 

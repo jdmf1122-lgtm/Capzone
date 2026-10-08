@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0B0F17" />
+      <stop offset="50%" stop-color="#111827" />
+      <stop offset="100%" stop-color="#1E293B" />
+    </linearGradient>
+    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3B82F6" />
+      <stop offset="100%" stop-color="#1D4ED8" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B" />
+      <stop offset="100%" stop-color="#D97706" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="16" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background rounded squircle for mobile app icon -->
+  <rect width="512" height="512" rx="120" fill="url(#bgGrad)" />
+  <rect width="510" height="510" x="1" y="1" rx="119" stroke="rgba(255,255,255,0.08)" stroke-width="2" />
+
+  <!-- Outer Glow Ring -->
+  <circle cx="256" cy="256" r="170" stroke="url(#blueGrad)" stroke-width="4" stroke-opacity="0.3" />
+
+  <!-- Cap Crown Silhouette -->
+  <g filter="url(#glow)">
+    <!-- Crown Dome -->
+    <path d="M150 280 C150 180, 210 140, 280 140 C340 140, 390 190, 390 280 Z" fill="url(#blueGrad)" />
+    <!-- Visor Bill -->
+    <path d="M110 300 C150 295, 230 290, 330 280 C360 280, 420 295, 430 315 C425 325, 360 340, 260 340 C170 340, 115 320, 110 300 Z" fill="#1E40AF" />
+    <!-- Visor Accent Stitching Line -->
+    <path d="M135 308 C200 318, 300 322, 400 306" stroke="rgba(255,255,255,0.4)" stroke-width="3" stroke-dasharray="6,4" fill="none" />
+    <!-- Top Button / Squatchee -->
+    <circle cx="280" cy="140" r="14" fill="url(#accentGrad)" />
+    <!-- Eyelets -->
+    <circle cx="225" cy="200" r="6" fill="#0B0F17" stroke="rgba(255,255,255,0.3)" stroke-width="2" />
+    <circle cx="295" cy="195" r="6" fill="#0B0F17" stroke="rgba(255,255,255,0.3)" stroke-width="2" />
+    <circle cx="345" cy="225" r="6" fill="#0B0F17" stroke="rgba(255,255,255,0.3)" stroke-width="2" />
+  </g>
+
+  <!-- Typography Brand Mark "CZ" -->
+  <text x="256" y="420" font-family="'Syne', 'Plus Jakarta Sans', sans-serif" font-size="44" font-weight="900" fill="#FFFFFF" text-anchor="middle" letter-spacing="4">CAPZONE<tspan fill="#3B82F6">.</tspan></text>
+</svg>

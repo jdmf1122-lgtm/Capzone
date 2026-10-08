@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0B0F17" />
+      <stop offset="100%" stop-color="#1E293B" />
+    </linearGradient>
+    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3B82F6" />
+      <stop offset="100%" stop-color="#1D4ED8" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B" />
+      <stop offset="100%" stop-color="#D97706" />
+    </linearGradient>
+  </defs>
+
+  <rect width="512" height="512" rx="120" fill="url(#bgGrad)" />
+  <circle cx="256" cy="256" r="170" stroke="url(#blueGrad)" stroke-width="6" stroke-opacity="0.3" />
+  <path d="M150 280 C150 180, 210 140, 280 140 C340 140, 390 190, 390 280 Z" fill="url(#blueGrad)" />
+  <path d="M110 300 C150 295, 230 290, 330 280 C360 280, 420 295, 430 315 C425 325, 360 340, 260 340 C170 340, 115 320, 110 300 Z" fill="#1E40AF" />
+  <circle cx="280" cy="140" r="14" fill="url(#accentGrad)" />
+  <text x="256" y="420" font-family="'Syne', sans-serif" font-size="44" font-weight="900" fill="#FFFFFF" text-anchor="middle" letter-spacing="4">CAPZONE<tspan fill="#3B82F6">.</tspan></text>
+</svg>

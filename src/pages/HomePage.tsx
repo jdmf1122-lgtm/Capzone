@@ -31,9 +31,9 @@ export const HomePage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-24">
+    <div className="space-y-12 sm:space-y-24">
       {/* 1. Hero Banner */}
-      <section className="relative min-h-[580px] lg:min-h-[680px] flex items-center bg-[#0B0F17] overflow-hidden border-b border-white/10">
+      <section className="relative min-h-[500px] sm:min-h-[580px] lg:min-h-[680px] flex items-center bg-[#0B0F17] overflow-hidden border-b border-white/10">
         {/* Background Atmosphere */}
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-r from-[#0B0F17] via-[#0B0F17]/85 to-transparent" />
@@ -41,13 +41,13 @@ export const HomePage: React.FC = () => {
         </div>
 
         {/* Hero Content */}
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
-          <div className="max-w-2xl space-y-6">
-            {/* Clean unboxed kicker (No pills) */}
-            <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-blue-400">
-              <span>Roxas, Oriental Mindoro Atelier</span>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 w-full">
+          <div className="max-w-2xl space-y-5 sm:space-y-6">
+            {/* Clean unboxed kicker */}
+            <div className="flex flex-wrap items-center gap-2 text-xs font-mono uppercase tracking-widest text-blue-400">
+              <span>Roxas, Oriental Mindoro</span>
               <span aria-hidden="true">·</span>
-              <span>2026 Headwear Drop</span>
+              <span>2026 Drops</span>
               <span aria-hidden="true">·</span>
               <span className="text-amber-400">Exclusive Run</span>
             </div>
@@ -59,14 +59,14 @@ export const HomePage: React.FC = () => {
               </span>
             </h1>
 
-            {/* CTAs */}
-            <div className="flex flex-wrap items-center gap-4 pt-2">
+            {/* CTAs - Mobile full-width stacked, desktop inline */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
               <button
                 onClick={() => {
                   setCurrentPage('shop');
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
-                className="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs uppercase tracking-wider rounded-lg transition-all shadow-xl shadow-blue-600/30 flex items-center gap-2"
+                className="tap-active w-full sm:w-auto px-7 py-3.5 sm:py-4 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs uppercase tracking-wider rounded-xl transition-all shadow-xl shadow-blue-600/30 flex items-center justify-center gap-2"
               >
                 <span>Shop Catalog</span>
                 <ArrowRight className="w-4 h-4" />
@@ -74,7 +74,7 @@ export const HomePage: React.FC = () => {
 
               <button
                 onClick={() => handleCategoryClick('limited-edition-caps')}
-                className="px-8 py-4 bg-white/10 hover:bg-white/20 text-white font-semibold text-xs uppercase tracking-wider rounded-lg transition-all border border-white/10 flex items-center gap-2"
+                className="tap-active w-full sm:w-auto px-7 py-3.5 sm:py-4 bg-white/10 hover:bg-white/20 text-white font-semibold text-xs uppercase tracking-wider rounded-xl transition-all border border-white/10 flex items-center justify-center gap-2"
               >
                 <Sparkles className="w-3.5 h-3.5 text-amber-400" />
                 <span>Limited Edition Crowns</span>
@@ -86,7 +86,7 @@ export const HomePage: React.FC = () => {
 
       {/* 2. Featured Products Showcase */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 mb-6 sm:mb-8">
           <div>
             <div className="text-xs font-mono uppercase tracking-wider text-blue-400 mb-1">
               Curated Selection
@@ -97,10 +97,10 @@ export const HomePage: React.FC = () => {
           </div>
 
           {/* Functional Segmented Controls */}
-          <div className="flex items-center gap-1 p-1 bg-[#182232] rounded-lg border border-white/10">
+          <div className="flex items-center gap-1 p-1 bg-[#182232] rounded-xl border border-white/10 overflow-x-auto no-scrollbar max-w-full">
             <button
               onClick={() => setProductTab('featured')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${
+              className={`tap-active px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap ${
                 productTab === 'featured'
                   ? 'bg-blue-600 text-white shadow'
                   : 'text-gray-400 hover:text-white'
@@ -110,7 +110,7 @@ export const HomePage: React.FC = () => {
             </button>
             <button
               onClick={() => setProductTab('new')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${
+              className={`tap-active px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap ${
                 productTab === 'new'
                   ? 'bg-blue-600 text-white shadow'
                   : 'text-gray-400 hover:text-white'
@@ -120,7 +120,7 @@ export const HomePage: React.FC = () => {
             </button>
             <button
               onClick={() => setProductTab('bestsellers')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${
+              className={`tap-active px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap ${
                 productTab === 'bestsellers'
                   ? 'bg-blue-600 text-white shadow'
                   : 'text-gray-400 hover:text-white'
@@ -131,8 +131,8 @@ export const HomePage: React.FC = () => {
           </div>
         </div>
 
-        {/* Product Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Product Grid - 2 columns on mobile, 4 columns on desktop */}
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
           {filteredProducts.slice(0, 8).map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
@@ -220,12 +220,18 @@ export const HomePage: React.FC = () => {
             <div
               key={p.id}
               onClick={() => handleProductClick(p.id)}
-              className="relative aspect-square rounded-xl overflow-hidden bg-[#182232] cursor-pointer group border border-white/10"
+              className="relative aspect-square rounded-xl overflow-hidden bg-[#0d131f] flex items-center justify-center p-2 cursor-pointer group border border-white/10"
             >
               <img
                 src={p.image}
+                alt=""
+                aria-hidden="true"
+                className="absolute inset-0 w-full h-full object-cover blur-xl opacity-20 scale-125 pointer-events-none"
+              />
+              <img
+                src={p.image}
                 alt={p.name}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                className="relative z-10 w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
               />
               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-3 text-center">
                 <span className="text-xs text-white font-medium">{p.name}</span>

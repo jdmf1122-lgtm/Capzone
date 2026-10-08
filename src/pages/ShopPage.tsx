@@ -105,7 +105,7 @@ export const ShopPage: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
-      {/* Page Title & Breadcrumbs */}
+      {/* Page Header & Controls Bar */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 border-b border-white/10">
         <div>
           <div className="text-xs font-mono uppercase tracking-wider text-blue-400 mb-1">
@@ -119,25 +119,22 @@ export const ShopPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Controls Bar */}
-        <div className="flex items-center gap-3">
+        {/* Action Controls */}
+        <div className="flex items-center gap-2">
           <button
-            onClick={() => setMobileFilterOpen(!mobileFilterOpen)}
-            className="md:hidden flex items-center gap-2 px-3 py-2 bg-[#182232] border border-white/10 rounded-lg text-xs font-medium text-white"
+            onClick={() => setMobileFilterOpen(true)}
+            className="tap-active md:hidden flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 py-2 bg-[#182232] border border-white/10 rounded-xl text-xs font-medium text-white shadow-sm"
           >
             <SlidersHorizontal className="w-3.5 h-3.5 text-blue-400" />
             <span>Filters ({activeFiltersCount})</span>
           </button>
 
-          <div className="flex items-center gap-2">
-            <label htmlFor="sort-select" className="text-xs text-gray-400 font-mono hidden sm:inline">
-              Sort:
-            </label>
+          <div className="flex items-center gap-2 flex-1 sm:flex-none">
             <select
               id="sort-select"
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="px-3 py-2 bg-[#182232] border border-white/10 rounded-lg text-xs text-white focus:outline-none focus:border-blue-500 font-mono"
+              className="w-full sm:w-auto px-3 py-2 bg-[#182232] border border-white/10 rounded-xl text-xs text-white focus:outline-none focus:border-blue-500 font-mono"
             >
               <option value="featured">Featured First</option>
               <option value="price-low">Price: Low to High</option>
@@ -150,13 +147,116 @@ export const ShopPage: React.FC = () => {
       </div>
 
       {/* Main Shop Layout: Sidebar Filters + Products Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-        {/* Filters Sidebar */}
-        <aside
-          className={`space-y-6 md:block ${
-            mobileFilterOpen ? 'block' : 'hidden'
-          } p-5 md:p-0 bg-[#111827] md:bg-transparent rounded-xl md:rounded-none border md:border-none border-white/10`}
-        >
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-8">
+        {/* Mobile Filter Modal/Sheet */}
+        {mobileFilterOpen && (
+          <div className="md:hidden fixed inset-0 z-50 flex items-end bg-black/75 backdrop-blur-sm animate-in fade-in duration-200">
+            <div className="w-full max-h-[85vh] bg-[#111827] rounded-t-2xl border-t border-white/15 p-5 overflow-y-auto space-y-6 shadow-2xl">
+              <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                <span className="text-sm font-bold uppercase font-mono tracking-wider text-white flex items-center gap-2">
+                  <SlidersHorizontal className="w-4 h-4 text-blue-400" /> Filter Options
+                </span>
+                <button
+                  onClick={() => setMobileFilterOpen(false)}
+                  className="p-1.5 text-gray-400 hover:text-white rounded-lg hover:bg-white/5"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Search Inside Filters */}
+              <div>
+                <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider font-mono block mb-1.5">
+                  Search by Keyword
+                </label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search caps..."
+                    className="w-full pl-9 pr-3 py-2 bg-[#182232] border border-white/10 rounded-xl text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 font-sans"
+                  />
+                </div>
+              </div>
+
+              {/* Categories */}
+              <div>
+                <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider font-mono block mb-2">
+                  Category
+                </label>
+                <div className="grid grid-cols-2 gap-1.5 text-xs">
+                  <button
+                    onClick={() => {
+                      setSelectedCategory('all');
+                      setSelectedCategorySlug(null);
+                    }}
+                    className={`px-3 py-2 rounded-lg text-left text-xs transition-colors ${
+                      selectedCategory === 'all'
+                        ? 'bg-blue-600 text-white font-semibold'
+                        : 'bg-[#182232] text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    All Categories ({products.length})
+                  </button>
+                  {categories.map((c) => (
+                    <button
+                      key={c.id}
+                      onClick={() => {
+                        setSelectedCategory(c.name);
+                        setSelectedCategorySlug(c.slug);
+                      }}
+                      className={`px-3 py-2 rounded-lg text-left text-xs truncate transition-colors ${
+                        selectedCategory === c.name
+                          ? 'bg-blue-600 text-white font-semibold'
+                          : 'bg-[#182232] text-gray-400 hover:text-white'
+                      }`}
+                    >
+                      {c.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Price Range */}
+              <div className="pt-2 border-t border-white/5">
+                <div className="flex items-center justify-between text-xs font-mono mb-2">
+                  <span className="font-semibold text-gray-300 uppercase tracking-wider">Max Price</span>
+                  <span className="text-blue-400 font-bold tabular-nums">₱{priceRange}</span>
+                </div>
+                <input
+                  type="range"
+                  min={250}
+                  max={1000}
+                  step={50}
+                  value={priceRange}
+                  onChange={(e) => setPriceRange(Number(e.target.value))}
+                  className="w-full accent-blue-600 cursor-pointer h-2 bg-[#182232] rounded-lg"
+                />
+              </div>
+
+              {/* Actions Footer */}
+              <div className="pt-3 border-t border-white/10 flex gap-2">
+                <button
+                  onClick={handleResetFilters}
+                  className="tap-active flex-1 py-3 bg-[#182232] hover:bg-white/10 text-gray-300 rounded-xl text-xs font-semibold uppercase tracking-wider font-mono"
+                >
+                  Reset
+                </button>
+                <button
+                  onClick={() => setMobileFilterOpen(false)}
+                  className="tap-active flex-1 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold uppercase tracking-wider"
+                >
+                  Apply Filters ({filteredProducts.length})
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Desktop Filters Sidebar */}
+        <aside className="hidden md:block space-y-6">
           <div className="flex items-center justify-between pb-3 border-b border-white/10">
             <span className="text-xs font-bold uppercase font-mono tracking-wider text-white flex items-center gap-2">
               <SlidersHorizontal className="w-3.5 h-3.5 text-blue-400" /> Filter Options
@@ -339,7 +439,7 @@ export const ShopPage: React.FC = () => {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
               {filteredProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}

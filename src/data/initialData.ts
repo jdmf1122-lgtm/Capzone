@@ -1,16 +1,26 @@
 import { Product, CategoryInfo, DiscountCode, Order, Review, User } from '../types';
 
-import heroImg from '../assets/images/hero_cap_streetwear_1791343159316.jpg';
-import classicBaseballImg from '../assets/images/product_classic_baseball_1791343174954.jpg';
-import nySnapbackImg from '../assets/images/product_ny_snapback_1791343189156.jpg';
-import urbanSnapbackImg from '../assets/images/product_urban_snapback_1791343301888.jpg';
-import vintageDadImg from '../assets/images/product_vintage_dad_1791343263123.jpg';
-import denimBucketImg from '../assets/images/product_denim_bucket_1791343201371.jpg';
-import sportsTruckerImg from '../assets/images/product_sports_trucker_1791343277334.jpg';
-import embroideredWaveImg from '../assets/images/product_embroidered_wave_1791343289132.jpg';
-import crownLimitedImg from '../assets/images/product_crown_limited_1791343211771.jpg';
+export const PRODUCT_ASSET_IMAGES = {
+  hero: '/assets/images/hero_cap_streetwear_1791343159316.jpg',
+  classicBaseball: '/assets/images/product_classic_baseball_1791343174954.jpg',
+  nySnapback: '/assets/images/product_ny_snapback_1791343189156.jpg',
+  urbanSnapback: '/assets/images/product_urban_snapback_1791343301888.jpg',
+  vintageDad: '/assets/images/product_vintage_dad_1791343263123.jpg',
+  denimBucket: '/assets/images/product_denim_bucket_1791343201371.jpg',
+  sportsTrucker: '/assets/images/product_sports_trucker_1791343277334.jpg',
+  embroideredWave: '/assets/images/product_embroidered_wave_1791343289132.jpg',
+  crownLimited: '/assets/images/product_crown_limited_1791343211771.jpg'
+};
 
-export { heroImg };
+export const heroImg = PRODUCT_ASSET_IMAGES.hero;
+export const classicBaseballImg = PRODUCT_ASSET_IMAGES.classicBaseball;
+export const nySnapbackImg = PRODUCT_ASSET_IMAGES.nySnapback;
+export const urbanSnapbackImg = PRODUCT_ASSET_IMAGES.urbanSnapback;
+export const vintageDadImg = PRODUCT_ASSET_IMAGES.vintageDad;
+export const denimBucketImg = PRODUCT_ASSET_IMAGES.denimBucket;
+export const sportsTruckerImg = PRODUCT_ASSET_IMAGES.sportsTrucker;
+export const embroideredWaveImg = PRODUCT_ASSET_IMAGES.embroideredWave;
+export const crownLimitedImg = PRODUCT_ASSET_IMAGES.crownLimited;
 
 export const INITIAL_PRODUCTS: Product[] = [
   {

@@ -25,7 +25,12 @@ import {
   Globe,
   Sparkles,
   ShieldAlert,
-  Terminal
+  Terminal,
+  ChevronDown,
+  ChevronUp,
+  Upload,
+  Smartphone,
+  Laptop
 } from 'lucide-react';
 import {
   getSupabaseCredentials,
@@ -36,6 +41,8 @@ import {
   isSupabaseConfigured
 } from '../lib/supabase';
 import { SUPABASE_SQL_SCHEMA } from '../data/supabaseSchemaSql';
+import { ProductImageUploader } from '../components/admin/ProductImageUploader';
+import { PRODUCT_ASSET_IMAGES } from '../data/initialData';
 
 export const AdminDashboardPage: React.FC = () => {
   const {
@@ -76,13 +83,13 @@ export const AdminDashboardPage: React.FC = () => {
   const handleSaveDbCredentials = async (e: React.FormEvent) => {
     e.preventDefault();
     setSupabaseCredentials(dbUrl, dbAnonKey);
-    showToast('Nai-save ang Supabase credentials!', 'success');
+    showToast('Supabase credentials saved successfully!', 'success');
     setTestingDb(true);
     const res = await testSupabaseConnection();
     setTestResult(res);
     setTestingDb(false);
     if (res.connected) {
-      showToast('Konektado na sa Supabase!', 'success');
+      showToast('Connected to Supabase successfully!', 'success');
       await refreshFromDatabase();
     } else {
       showToast(res.message, 'error');
@@ -95,7 +102,7 @@ export const AdminDashboardPage: React.FC = () => {
     setDbUrl(creds.url);
     setDbAnonKey(creds.anonKey);
     setTestResult(null);
-    showToast('Na-reset ang Supabase credentials.', 'info');
+    showToast('Supabase credentials reset.', 'info');
   };
 
   const handleTestConnection = async () => {
@@ -115,7 +122,7 @@ export const AdminDashboardPage: React.FC = () => {
     const res = await syncAllWithSupabase();
     setSeedingDb(false);
     if (res.success) {
-      showToast('Nai-sync ang lahat ng data sa Supabase!', 'success');
+      showToast('All store data synchronized with Supabase!', 'success');
       const testRes = await testSupabaseConnection();
       setTestResult(testRes);
     } else {
@@ -126,7 +133,7 @@ export const AdminDashboardPage: React.FC = () => {
   const handleCopySql = () => {
     navigator.clipboard.writeText(SUPABASE_SQL_SCHEMA);
     setCopiedSql(true);
-    showToast('Na-kopya ang SQL Schema sa clipboard!', 'success');
+    showToast('SQL Schema copied to clipboard!', 'success');
     setTimeout(() => setCopiedSql(false), 3000);
   };
 
@@ -138,10 +145,22 @@ export const AdminDashboardPage: React.FC = () => {
   const [prodName, setProdName] = useState('');
   const [prodCategory, setProdCategory] = useState<CapCategory>('Baseball Caps');
   const [prodPrice, setProdPrice] = useState(499);
+  const [prodOriginalPrice, setProdOriginalPrice] = useState<number | ''>('');
   const [prodStock, setProdStock] = useState(25);
   const [prodDesc, setProdDesc] = useState('');
   const [prodImg, setProdImg] = useState('');
+  const [prodGallery, setProdGallery] = useState<string[]>([]);
   const [prodColors, setProdColors] = useState('Matte Black, Charcoal');
+  const [prodIsFeatured, setProdIsFeatured] = useState(true);
+  const [prodIsNewArrival, setProdIsNewArrival] = useState(true);
+  const [prodIsBestSeller, setProdIsBestSeller] = useState(false);
+  const [prodIsLimited, setProdIsLimited] = useState(false);
+  const [prodMaterial, setProdMaterial] = useState('100% Heavy Brushed Cotton Twill');
+  const [prodCrown, setProdCrown] = useState('Structured 6-Panel Mid-Profile');
+  const [prodVisor, setProdVisor] = useState('Permacurv Memory Visor');
+  const [prodClosure, setProdClosure] = useState('Adjustable Clasp Strap');
+  const [prodOrigin, setProdOrigin] = useState('Crafted in Roxas, Oriental Mindoro');
+  const [showAdvancedSpecs, setShowAdvancedSpecs] = useState(false);
 
   // Discount Form State
   const [newDiscountCode, setNewDiscountCode] = useState('');
@@ -165,10 +184,22 @@ export const AdminDashboardPage: React.FC = () => {
     setProdName('');
     setProdCategory('Baseball Caps');
     setProdPrice(499);
+    setProdOriginalPrice(599);
     setProdStock(30);
-    setProdDesc('Structured crown headwear crafted from heavyweight brushed twill.');
-    setProdImg(products[0]?.image || '');
+    setProdDesc('Structured crown headwear crafted from heavyweight brushed twill with precision stitching.');
+    setProdImg(PRODUCT_ASSET_IMAGES.classicBaseball);
+    setProdGallery([]);
     setProdColors('Matte Black, Pure White');
+    setProdIsFeatured(true);
+    setProdIsNewArrival(true);
+    setProdIsBestSeller(false);
+    setProdIsLimited(false);
+    setProdMaterial('100% Heavy Brushed Cotton Twill');
+    setProdCrown('Structured 6-Panel Mid-Profile');
+    setProdVisor('Permacurv Memory Visor');
+    setProdClosure('Adjustable Antiqued Brass Buckle');
+    setProdOrigin('Crafted in Roxas, Oriental Mindoro');
+    setShowAdvancedSpecs(false);
     setProductModalOpen(true);
   };
 
@@ -177,49 +208,92 @@ export const AdminDashboardPage: React.FC = () => {
     setProdName(p.name);
     setProdCategory(p.category);
     setProdPrice(p.price);
+    setProdOriginalPrice(p.originalPrice != null ? p.originalPrice : '');
     setProdStock(p.stock);
     setProdDesc(p.description);
     setProdImg(p.image);
+    setProdGallery(p.gallery || []);
     setProdColors(p.colors.map((c) => c.name).join(', '));
+    setProdIsFeatured(Boolean(p.isFeatured));
+    setProdIsNewArrival(Boolean(p.isNewArrival));
+    setProdIsBestSeller(Boolean(p.isBestSeller));
+    setProdIsLimited(Boolean(p.isLimited));
+    setProdMaterial(p.specs?.material || '100% Premium Twill');
+    setProdCrown(p.specs?.crown || 'Structured 6-Panel');
+    setProdVisor(p.specs?.visor || 'Permacurv Visor');
+    setProdClosure(p.specs?.closure || 'Adjustable Clasp');
+    setProdOrigin(p.specs?.origin || 'Crafted in Roxas, Oriental Mindoro');
+    setShowAdvancedSpecs(false);
     setProductModalOpen(true);
   };
 
   const handleSaveProduct = (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!prodImg) {
+      alert('Please upload or select at least one photo for the cap.');
+      return;
+    }
+
     const colorObjects = prodColors.split(',').map((c) => {
       const name = c.trim();
-      return { name, hex: name.toLowerCase().includes('white') ? '#F9FAFB' : '#111827' };
+      const lower = name.toLowerCase();
+      let hex = '#111827';
+      if (lower.includes('white')) hex = '#F9FAFB';
+      else if (lower.includes('blue')) hex = '#2563EB';
+      else if (lower.includes('red') || lower.includes('crimson')) hex = '#DC2626';
+      else if (lower.includes('gray') || lower.includes('grey')) hex = '#6B7280';
+      else if (lower.includes('green') || lower.includes('olive')) hex = '#556B2F';
+      else if (lower.includes('khaki') || lower.includes('tan') || lower.includes('sand')) hex = '#A3907C';
+      else if (lower.includes('gold') || lower.includes('yellow')) hex = '#D97706';
+      return { name, hex };
     });
+
+    const finalGallery = Array.from(new Set([prodImg, ...prodGallery].filter(Boolean)));
+
+    const specsPayload = {
+      material: prodMaterial.trim() || '100% Heavy Brushed Cotton Twill',
+      crown: prodCrown.trim() || 'Structured 6-Panel Mid-Profile',
+      closure: prodClosure.trim() || 'Adjustable Clasp',
+      visor: prodVisor.trim() || 'Permacurv Visor',
+      origin: prodOrigin.trim() || 'Crafted in Roxas, Oriental Mindoro'
+    };
 
     if (editingProduct) {
       editProduct(editingProduct.id, {
         name: prodName,
         category: prodCategory,
         price: Number(prodPrice),
+        originalPrice: prodOriginalPrice !== '' ? Number(prodOriginalPrice) : undefined,
         stock: Number(prodStock),
         description: prodDesc,
         image: prodImg,
-        colors: colorObjects
+        gallery: finalGallery,
+        colors: colorObjects,
+        isFeatured: prodIsFeatured,
+        isNewArrival: prodIsNewArrival,
+        isBestSeller: prodIsBestSeller,
+        isLimited: prodIsLimited,
+        specs: specsPayload
       });
     } else {
       addProduct({
         name: prodName,
         category: prodCategory,
         price: Number(prodPrice),
+        originalPrice: prodOriginalPrice !== '' ? Number(prodOriginalPrice) : undefined,
         stock: Number(prodStock),
         description: prodDesc,
         image: prodImg,
+        gallery: finalGallery,
         rating: 5.0,
-        reviewCount: 1,
+        reviewCount: 0,
         colors: colorObjects,
-        specs: {
-          material: '100% Premium Cotton / Wool Blend',
-          crown: 'Structured 6-Panel Crown',
-          closure: 'Adjustable Clasp',
-          visor: 'Memory Mold Visor',
-          origin: 'Crafted in Roxas, Oriental Mindoro'
-        }
+        isFeatured: prodIsFeatured,
+        isNewArrival: prodIsNewArrival,
+        isBestSeller: prodIsBestSeller,
+        isLimited: prodIsLimited,
+        specs: specsPayload
       });
     }
 
@@ -294,10 +368,10 @@ export const AdminDashboardPage: React.FC = () => {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-white/10 text-xs font-mono">
+      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 border-b border-white/10 text-xs font-mono">
         <button
           onClick={() => setActiveTab('overview')}
-          className={`px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
+          className={`tap-active px-3 sm:px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
             activeTab === 'overview'
               ? 'bg-blue-600 text-white font-bold'
               : 'text-gray-400 hover:text-white hover:bg-white/5'
@@ -307,7 +381,7 @@ export const AdminDashboardPage: React.FC = () => {
         </button>
         <button
           onClick={() => setActiveTab('products')}
-          className={`px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
+          className={`tap-active px-3 sm:px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
             activeTab === 'products'
               ? 'bg-blue-600 text-white font-bold'
               : 'text-gray-400 hover:text-white hover:bg-white/5'
@@ -317,7 +391,7 @@ export const AdminDashboardPage: React.FC = () => {
         </button>
         <button
           onClick={() => setActiveTab('orders')}
-          className={`px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
+          className={`tap-active px-3 sm:px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
             activeTab === 'orders'
               ? 'bg-blue-600 text-white font-bold'
               : 'text-gray-400 hover:text-white hover:bg-white/5'
@@ -327,7 +401,7 @@ export const AdminDashboardPage: React.FC = () => {
         </button>
         <button
           onClick={() => setActiveTab('categories')}
-          className={`px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
+          className={`tap-active px-3 sm:px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
             activeTab === 'categories'
               ? 'bg-blue-600 text-white font-bold'
               : 'text-gray-400 hover:text-white hover:bg-white/5'
@@ -337,7 +411,7 @@ export const AdminDashboardPage: React.FC = () => {
         </button>
         <button
           onClick={() => setActiveTab('discounts')}
-          className={`px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
+          className={`tap-active px-3 sm:px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
             activeTab === 'discounts'
               ? 'bg-blue-600 text-white font-bold'
               : 'text-gray-400 hover:text-white hover:bg-white/5'
@@ -347,7 +421,7 @@ export const AdminDashboardPage: React.FC = () => {
         </button>
         <button
           onClick={() => setActiveTab('customers')}
-          className={`px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
+          className={`tap-active px-3 sm:px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
             activeTab === 'customers'
               ? 'bg-blue-600 text-white font-bold'
               : 'text-gray-400 hover:text-white hover:bg-white/5'
@@ -357,7 +431,7 @@ export const AdminDashboardPage: React.FC = () => {
         </button>
         <button
           onClick={() => setActiveTab('database')}
-          className={`px-4 py-2 rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5 ${
+          className={`tap-active px-3 sm:px-4 py-2 rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5 ${
             activeTab === 'database'
               ? 'bg-emerald-600 text-white font-bold shadow-md shadow-emerald-600/30'
               : 'text-emerald-400 hover:text-white hover:bg-emerald-500/10 border border-emerald-500/20'
@@ -373,51 +447,51 @@ export const AdminDashboardPage: React.FC = () => {
 
       {/* 1. Overview Tab */}
       {activeTab === 'overview' && (
-        <div className="space-y-8 animate-in fade-in duration-150">
-          {/* Key Metrics KPI Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 font-mono">
-            <div className="p-6 bg-[#111827] rounded-xl border border-white/10 space-y-2">
+        <div className="space-y-6 sm:space-y-8 animate-in fade-in duration-150">
+          {/* Key Metrics KPI Cards (2 cols on mobile, 4 on desktop) */}
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 font-mono">
+            <div className="p-4 sm:p-6 bg-[#111827] rounded-xl border border-white/10 space-y-2">
               <div className="flex items-center justify-between text-gray-400">
-                <span className="text-xs uppercase tracking-wider">Gross Sales (PHP)</span>
-                <PesoIcon className="w-4 h-4 text-emerald-400" />
+                <span className="text-[10px] sm:text-xs uppercase tracking-wider truncate">Sales (PHP)</span>
+                <PesoIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400 shrink-0" />
               </div>
-              <p className="text-2xl font-extrabold text-white tabular-nums font-['Syne']">
+              <p className="text-lg sm:text-2xl font-extrabold text-white tabular-nums font-['Syne']">
                 ₱{totalRevenue.toLocaleString()}
               </p>
-              <p className="text-[11px] text-emerald-400 font-sans">All settled & active orders (PHP)</p>
+              <p className="text-[10px] sm:text-[11px] text-emerald-400 font-sans truncate">All orders</p>
             </div>
 
-            <div className="p-6 bg-[#111827] rounded-xl border border-white/10 space-y-2">
+            <div className="p-4 sm:p-6 bg-[#111827] rounded-xl border border-white/10 space-y-2">
               <div className="flex items-center justify-between text-gray-400">
-                <span className="text-xs uppercase tracking-wider">Total Orders</span>
-                <ShoppingBag className="w-4 h-4 text-blue-400" />
+                <span className="text-[10px] sm:text-xs uppercase tracking-wider truncate">Total Orders</span>
+                <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-400 shrink-0" />
               </div>
-              <p className="text-2xl font-extrabold text-white tabular-nums font-['Syne']">
+              <p className="text-lg sm:text-2xl font-extrabold text-white tabular-nums font-['Syne']">
                 {totalOrdersCount}
               </p>
-              <p className="text-[11px] text-gray-400 font-sans">Orders in Roxas Barangays</p>
+              <p className="text-[10px] sm:text-[11px] text-gray-400 font-sans truncate">Roxas Local</p>
             </div>
 
-            <div className="p-6 bg-[#111827] rounded-xl border border-white/10 space-y-2">
+            <div className="p-4 sm:p-6 bg-[#111827] rounded-xl border border-white/10 space-y-2">
               <div className="flex items-center justify-between text-gray-400">
-                <span className="text-xs uppercase tracking-wider">Avg Order Value</span>
-                <Package className="w-4 h-4 text-purple-400" />
+                <span className="text-[10px] sm:text-xs uppercase tracking-wider truncate">Avg Basket</span>
+                <Package className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-400 shrink-0" />
               </div>
-              <p className="text-2xl font-extrabold text-white tabular-nums font-['Syne']">
+              <p className="text-lg sm:text-2xl font-extrabold text-white tabular-nums font-['Syne']">
                 ₱{avgOrderValue.toLocaleString()}
               </p>
-              <p className="text-[11px] text-gray-400 font-sans">Per checkout basket</p>
+              <p className="text-[10px] sm:text-[11px] text-gray-400 font-sans truncate">Per checkout</p>
             </div>
 
-            <div className="p-6 bg-[#111827] rounded-xl border border-white/10 space-y-2">
+            <div className="p-4 sm:p-6 bg-[#111827] rounded-xl border border-white/10 space-y-2">
               <div className="flex items-center justify-between text-gray-400">
-                <span className="text-xs uppercase tracking-wider">Inventory Stock</span>
-                <AlertTriangle className="w-4 h-4 text-amber-400" />
+                <span className="text-[10px] sm:text-xs uppercase tracking-wider truncate">Total Stock</span>
+                <AlertTriangle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400 shrink-0" />
               </div>
-              <p className="text-2xl font-extrabold text-white tabular-nums font-['Syne']">
+              <p className="text-lg sm:text-2xl font-extrabold text-white tabular-nums font-['Syne']">
                 {totalStockUnits} <span className="text-xs text-gray-400 font-normal">units</span>
               </p>
-              <p className="text-[11px] text-amber-400 font-sans">{lowStockItems.length} low stock warnings</p>
+              <p className="text-[10px] sm:text-[11px] text-amber-400 font-sans truncate">{lowStockItems.length} low stock</p>
             </div>
           </div>
 
@@ -483,17 +557,68 @@ export const AdminDashboardPage: React.FC = () => {
       {/* 2. Products Tab */}
       {activeTab === 'products' && (
         <div className="space-y-4 animate-in fade-in duration-150">
-          <div className="flex items-center justify-between text-xs font-mono text-gray-400">
+          <div className="flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-gray-400">
             <span>Catalog Total: {products.length} Products</span>
             <button
               onClick={handleOpenAddProduct}
-              className="text-blue-400 hover:underline flex items-center gap-1"
+              className="tap-active px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-semibold flex items-center gap-2 shadow-md shadow-blue-600/20 transition-all text-xs"
             >
-              <Plus className="w-3.5 h-3.5" /> Add Cap
+              <Plus className="w-4 h-4" />
+              <span>Upload New Cap (Laptop / Phone)</span>
             </button>
           </div>
 
-          <div className="overflow-x-auto bg-[#111827] border border-white/10 rounded-xl">
+          {/* Mobile Card List (Cellphones) */}
+          <div className="grid grid-cols-1 gap-3 sm:hidden">
+            {products.map((p) => (
+              <div
+                key={p.id}
+                className="p-3.5 bg-[#111827] border border-white/10 rounded-xl flex items-center gap-3"
+              >
+                <img
+                  src={p.image}
+                  alt={p.name}
+                  className="w-16 h-16 object-contain p-1 rounded-lg bg-black/40 border border-white/10 shrink-0"
+                />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="font-semibold text-white truncate text-xs">{p.name}</p>
+                    <span className="text-white font-bold text-xs shrink-0">₱{p.price}</span>
+                  </div>
+                  <p className="text-[10px] text-gray-400 font-mono mt-0.5">{p.category}</p>
+                  <div className="flex items-center justify-between mt-2 pt-2 border-t border-white/5">
+                    <span
+                      className={`text-[10px] font-mono font-bold ${
+                        p.stock < 15 ? 'text-amber-400' : 'text-emerald-400'
+                      }`}
+                    >
+                      {p.stock} units
+                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEditProduct(p)}
+                        className="tap-active px-2.5 py-1 text-xs bg-white/5 hover:bg-white/10 text-gray-300 rounded-md flex items-center gap-1 font-mono"
+                      >
+                        <Edit2 className="w-3 h-3" /> Edit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => deleteProduct(p.id)}
+                        className="tap-active p-1 text-gray-400 hover:text-rose-400 rounded hover:bg-rose-500/10"
+                        title="Delete Cap"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Table (Laptops & Desktops) */}
+          <div className="hidden sm:block overflow-x-auto bg-[#111827] border border-white/10 rounded-xl">
             <table className="w-full text-left text-xs">
               <thead>
                 <tr className="border-b border-white/10 text-gray-400 uppercase text-[10px] font-mono">
@@ -512,7 +637,7 @@ export const AdminDashboardPage: React.FC = () => {
                       <img
                         src={p.image}
                         alt={p.name}
-                        className="w-12 h-12 object-cover rounded bg-black/40 border border-white/10 shrink-0"
+                        className="w-12 h-12 object-contain p-1 rounded bg-black/40 border border-white/10 shrink-0"
                       />
                       <div className="font-sans">
                         <p className="font-semibold text-white truncate max-w-xs">{p.name}</p>
@@ -1018,7 +1143,7 @@ export const AdminDashboardPage: React.FC = () => {
                     className="w-full px-3.5 py-2.5 bg-[#182232] border border-white/10 rounded-lg text-white font-mono text-xs focus:outline-none focus:border-emerald-500"
                   />
                   <p className="text-[11px] text-gray-500 mt-1">
-                    Hanapin sa: Supabase Dashboard &gt; Project Settings &gt; API &gt; Project URL
+                    Find in: Supabase Dashboard &gt; Project Settings &gt; API &gt; Project URL
                   </p>
                 </div>
 
@@ -1035,7 +1160,7 @@ export const AdminDashboardPage: React.FC = () => {
                     className="w-full px-3.5 py-2.5 bg-[#182232] border border-white/10 rounded-lg text-white font-mono text-xs focus:outline-none focus:border-emerald-500"
                   />
                   <p className="text-[11px] text-gray-500 mt-1">
-                    Hanapin sa: Supabase Dashboard &gt; Project Settings &gt; API &gt; anon public
+                    Find in: Supabase Dashboard &gt; Project Settings &gt; API &gt; anon public
                   </p>
                 </div>
 
@@ -1101,9 +1226,9 @@ export const AdminDashboardPage: React.FC = () => {
                     1
                   </span>
                   <div>
-                    <strong className="text-white">Gumawa ng libreng Supabase Project:</strong>
+                    <strong className="text-white">Create a free Supabase Project:</strong>
                     <p className="text-gray-400 mt-0.5">
-                      Pumunta sa <a href="https://supabase.com" target="_blank" rel="noreferrer" className="text-blue-400 underline">supabase.com</a>, mag-sign in at mag-create ng bagong project (hal. <code className="text-gray-200">capzone-db</code>).
+                      Go to <a href="https://supabase.com" target="_blank" rel="noreferrer" className="text-blue-400 underline">supabase.com</a>, sign in, and create a new project (e.g. <code className="text-gray-200">capzone-db</code>).
                     </p>
                   </div>
                 </li>
@@ -1113,9 +1238,9 @@ export const AdminDashboardPage: React.FC = () => {
                     2
                   </span>
                   <div>
-                    <strong className="text-white">Patakbuhin ang SQL Schema:</strong>
+                    <strong className="text-white">Run the SQL Schema:</strong>
                     <p className="text-gray-400 mt-0.5">
-                      Pumunta sa Supabase Dashboard &gt; <strong>SQL Editor</strong> &gt; <strong>New Query</strong>. I-paste ang SQL schema mula sa button sa itaas (o buksan ang <code className="text-emerald-400">supabase_schema.sql</code> sa root ng project) at i-click ang <strong>RUN</strong>.
+                      Open Supabase Dashboard &gt; <strong>SQL Editor</strong> &gt; <strong>New Query</strong>. Paste the SQL schema copied above (or open <code className="text-emerald-400">supabase_schema.sql</code> in project root) and click <strong>RUN</strong>.
                     </p>
                   </div>
                 </li>
@@ -1125,9 +1250,9 @@ export const AdminDashboardPage: React.FC = () => {
                     3
                   </span>
                   <div>
-                    <strong className="text-white">I-link ang Credentials:</strong>
+                    <strong className="text-white">Connect Project Credentials:</strong>
                     <p className="text-gray-400 mt-0.5">
-                      I-paste ang Project URL at Anon Key sa form sa kaliwa, o ilagay sa <code className="text-emerald-400">.env</code> file:
+                      Paste the Project URL and Anon Key into the form on the left, or add them to your <code className="text-emerald-400">.env</code> file:
                     </p>
                     <pre className="mt-1.5 p-2 bg-[#0B0F17] rounded border border-white/5 font-mono text-[10px] text-gray-400 overflow-x-auto">
 VITE_SUPABASE_URL=https://your-project.supabase.co
@@ -1144,7 +1269,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOi...
                   onClick={() => setShowSqlPreview(!showSqlPreview)}
                   className="text-xs font-mono text-gray-400 hover:text-white flex items-center gap-1 transition-colors"
                 >
-                  <span>{showSqlPreview ? '▼ Itago ang SQL Schema' : '▶ Tingnan ang SQL Schema Script'}</span>
+                  <span>{showSqlPreview ? '▼ Hide SQL Schema Script' : '▶ View SQL Schema Script'}</span>
                 </button>
 
                 {showSqlPreview && (
@@ -1160,133 +1285,322 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOi...
 
       {/* Product Upload / Edit Modal */}
       {productModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="relative w-full max-w-2xl bg-[#111827] border border-white/10 rounded-xl p-6 sm:p-8 text-white shadow-2xl overflow-y-auto max-h-[90vh]">
-            <div className="flex items-center justify-between pb-4 border-b border-white/10">
-              <h3 className="text-xl font-bold font-['Syne']">
-                {editingProduct ? 'Edit Cap Details' : 'Upload New Streetwear Cap'}
-              </h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="relative w-full max-w-3xl bg-[#111827] border border-white/10 rounded-2xl text-white shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-5 sm:px-7 py-4 border-b border-white/10 bg-[#0F172A]/80 backdrop-blur-sm shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-blue-600/15 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0">
+                  <Upload className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base sm:text-lg font-bold font-['Syne'] leading-tight">
+                    {editingProduct ? 'Edit Cap Details' : 'Upload New Streetwear Cap'}
+                  </h3>
+                  <p className="text-[11px] text-gray-400 font-mono">
+                    Upload cap photography from your laptop or phone
+                  </p>
+                </div>
+              </div>
               <button
+                type="button"
                 onClick={() => setProductModalOpen(false)}
-                className="p-1 text-gray-400 hover:text-white rounded-lg hover:bg-white/5"
+                className="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-white/5 transition-colors"
+                title="Close"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSaveProduct} className="mt-6 space-y-4 text-xs">
-              <div>
-                <label className="text-gray-400 font-mono block mb-1">Product Title</label>
-                <input
-                  type="text"
-                  required
-                  value={prodName}
-                  onChange={(e) => setProdName(e.target.value)}
-                  placeholder="e.g. Carbon Fiber Street Snapback"
-                  className="w-full px-3 py-2.5 bg-[#182232] border border-white/10 rounded-lg text-white text-xs"
+            {/* Modal Scrollable Body */}
+            <form onSubmit={handleSaveProduct} className="flex-1 overflow-y-auto p-5 sm:p-7 space-y-6 text-xs">
+              {/* Section 1: Product Photography Studio */}
+              <div className="bg-[#151D2C] p-4 sm:p-5 rounded-xl border border-white/10">
+                <ProductImageUploader
+                  primaryImage={prodImg}
+                  galleryImages={prodGallery}
+                  onChangePrimaryImage={setProdImg}
+                  onChangeGalleryImages={setProdGallery}
+                  productName={prodName}
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                  <label className="text-gray-400 font-mono block mb-1">Category</label>
-                  <select
-                    value={prodCategory}
-                    onChange={(e) => setProdCategory(e.target.value as CapCategory)}
-                    className="w-full px-3 py-2.5 bg-[#182232] border border-white/10 rounded-lg text-white font-mono text-xs"
-                  >
-                    <option value="Baseball Caps">Baseball Caps</option>
-                    <option value="Snapback Caps">Snapback Caps</option>
-                    <option value="Bucket Hats">Bucket Hats</option>
-                    <option value="Dad Hats">Dad Hats</option>
-                    <option value="Trucker Caps">Trucker Caps</option>
-                    <option value="Premium Embroidered Caps">Premium Embroidered Caps</option>
-                    <option value="Limited Edition Caps">Limited Edition Caps</option>
-                    <option value="Streetwear Collection">Streetwear Collection</option>
-                    <option value="Sports Collection">Sports Collection</option>
-                  </select>
-                </div>
+              {/* Section 2: General Information */}
+              <div className="space-y-4">
+                <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-blue-400 flex items-center gap-2">
+                  <span>General Product Details</span>
+                </h4>
 
                 <div>
-                  <label className="text-gray-400 font-mono block mb-1">Price (₱ PHP)</label>
+                  <label className="text-gray-300 font-mono block mb-1 font-semibold">
+                    Product Title / Cap Name *
+                  </label>
                   <input
-                    type="number"
+                    type="text"
                     required
-                    min={100}
-                    value={prodPrice}
-                    onChange={(e) => setProdPrice(Number(e.target.value))}
-                    className="w-full px-3 py-2.5 bg-[#182232] border border-white/10 rounded-lg text-white font-mono text-xs"
+                    value={prodName}
+                    onChange={(e) => setProdName(e.target.value)}
+                    placeholder="e.g. CapZone Mindoro Wave 5-Panel"
+                    className="w-full px-3.5 py-2.5 bg-[#182232] border border-white/10 rounded-lg text-white text-xs focus:border-blue-500 focus:outline-hidden"
                   />
                 </div>
 
-                <div>
-                  <label className="text-gray-400 font-mono block mb-1">Stock Quantity</label>
-                  <input
-                    type="number"
-                    required
-                    min={0}
-                    value={prodStock}
-                    onChange={(e) => setProdStock(Number(e.target.value))}
-                    className="w-full px-3 py-2.5 bg-[#182232] border border-white/10 rounded-lg text-white font-mono text-xs"
-                  />
-                </div>
-              </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                  <div>
+                    <label className="text-gray-300 font-mono block mb-1 font-semibold">Category *</label>
+                    <select
+                      value={prodCategory}
+                      onChange={(e) => setProdCategory(e.target.value as CapCategory)}
+                      className="w-full px-3 py-2.5 bg-[#182232] border border-white/10 rounded-lg text-white font-mono text-xs focus:border-blue-500 focus:outline-hidden"
+                    >
+                      <option value="Baseball Caps">Baseball Caps</option>
+                      <option value="Snapback Caps">Snapback Caps</option>
+                      <option value="Bucket Hats">Bucket Hats</option>
+                      <option value="Dad Hats">Dad Hats</option>
+                      <option value="Trucker Caps">Trucker Caps</option>
+                      <option value="Premium Embroidered Caps">Premium Embroidered Caps</option>
+                      <option value="Limited Edition Caps">Limited Edition Caps</option>
+                      <option value="Streetwear Collection">Streetwear Collection</option>
+                      <option value="Sports Collection">Sports Collection</option>
+                    </select>
+                  </div>
 
-              <div>
-                <label className="text-gray-400 font-mono block mb-1">
-                  Color Options (comma-separated names)
-                </label>
-                <input
-                  type="text"
-                  value={prodColors}
-                  onChange={(e) => setProdColors(e.target.value)}
-                  placeholder="e.g. Stealth Black, Pure White, Royal Blue"
-                  className="w-full px-3 py-2.5 bg-[#182232] border border-white/10 rounded-lg text-white font-mono text-xs"
-                />
-              </div>
-
-              <div>
-                <label className="text-gray-400 font-mono block mb-1">Select Photography Preset</label>
-                <div className="flex gap-2 overflow-x-auto pb-2">
-                  {products.slice(0, 5).map((p) => (
-                    <img
-                      key={p.id}
-                      src={p.image}
-                      alt={p.name}
-                      onClick={() => setProdImg(p.image)}
-                      className={`w-14 h-14 object-cover rounded-lg border cursor-pointer ${
-                        prodImg === p.image ? 'border-blue-500 ring-2 ring-blue-500' : 'border-white/10 opacity-70'
-                      }`}
+                  <div>
+                    <label className="text-gray-300 font-mono block mb-1 font-semibold">Price (₱ PHP) *</label>
+                    <input
+                      type="number"
+                      required
+                      min={50}
+                      value={prodPrice}
+                      onChange={(e) => setProdPrice(Number(e.target.value))}
+                      className="w-full px-3 py-2.5 bg-[#182232] border border-white/10 rounded-lg text-white font-mono text-xs focus:border-blue-500 focus:outline-hidden"
                     />
-                  ))}
+                  </div>
+
+                  <div>
+                    <label className="text-gray-300 font-mono block mb-1">
+                      Original Price (₱) <span className="text-gray-500">(Optional)</span>
+                    </label>
+                    <input
+                      type="number"
+                      min={0}
+                      value={prodOriginalPrice}
+                      onChange={(e) => setProdOriginalPrice(e.target.value === '' ? '' : Number(e.target.value))}
+                      placeholder="e.g. 599 (for sale badge)"
+                      className="w-full px-3 py-2.5 bg-[#182232] border border-white/10 rounded-lg text-white font-mono text-xs focus:border-blue-500 focus:outline-hidden"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-gray-300 font-mono block mb-1 font-semibold">Stock Quantity *</label>
+                    <input
+                      type="number"
+                      required
+                      min={0}
+                      value={prodStock}
+                      onChange={(e) => setProdStock(Number(e.target.value))}
+                      className="w-full px-3 py-2.5 bg-[#182232] border border-white/10 rounded-lg text-white font-mono text-xs focus:border-blue-500 focus:outline-hidden"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-gray-300 font-mono font-semibold">
+                      Colorways & Variants
+                    </label>
+                    <span className="text-[10px] text-gray-500 font-mono">Comma-separated</span>
+                  </div>
+                  <input
+                    type="text"
+                    value={prodColors}
+                    onChange={(e) => setProdColors(e.target.value)}
+                    placeholder="e.g. Stealth Black, Pure White, Royal Blue"
+                    className="w-full px-3.5 py-2.5 bg-[#182232] border border-white/10 rounded-lg text-white font-mono text-xs focus:border-blue-500 focus:outline-hidden"
+                  />
+                  {/* Quick Color Presets */}
+                  <div className="flex flex-wrap gap-1.5 mt-2">
+                    {[
+                      'Matte Black',
+                      'Pure White',
+                      'Royal Blue',
+                      'Heather Gray',
+                      'Faded Olive',
+                      'Raw Indigo',
+                      'Desert Sand',
+                      'Obsidian Gold'
+                    ].map((col) => (
+                      <button
+                        key={col}
+                        type="button"
+                        onClick={() => {
+                          const current = prodColors.split(',').map((c) => c.trim()).filter(Boolean);
+                          if (!current.includes(col)) {
+                            setProdColors(current.length > 0 ? `${prodColors}, ${col}` : col);
+                          }
+                        }}
+                        className="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 text-[10px] font-mono text-gray-400 hover:text-white transition-colors"
+                      >
+                        + {col}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-gray-300 font-mono block mb-1 font-semibold">Product Description *</label>
+                  <textarea
+                    rows={3}
+                    required
+                    value={prodDesc}
+                    onChange={(e) => setProdDesc(e.target.value)}
+                    placeholder="Detailed craftsmanship, materials, styling recommendations..."
+                    className="w-full px-3.5 py-2.5 bg-[#182232] border border-white/10 rounded-lg text-white text-xs focus:border-blue-500 focus:outline-hidden"
+                  />
                 </div>
               </div>
 
-              <div>
-                <label className="text-gray-400 font-mono block mb-1">Product Description</label>
-                <textarea
-                  rows={3}
-                  required
-                  value={prodDesc}
-                  onChange={(e) => setProdDesc(e.target.value)}
-                  className="w-full px-3 py-2 bg-[#182232] border border-white/10 rounded-lg text-white text-xs"
-                />
+              {/* Section 3: Badges & Display Tags */}
+              <div className="p-4 bg-[#151D2C] rounded-xl border border-white/10 space-y-2">
+                <label className="text-gray-300 font-mono text-xs font-semibold block mb-2">
+                  Store Badges & Flags
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                  <label className="flex items-center gap-2 p-2 rounded-lg bg-[#0B0F17] border border-white/5 cursor-pointer hover:bg-white/5">
+                    <input
+                      type="checkbox"
+                      checked={prodIsFeatured}
+                      onChange={(e) => setProdIsFeatured(e.target.checked)}
+                      className="rounded text-blue-600 focus:ring-0"
+                    />
+                    <span className="font-mono text-[11px] text-gray-300">Featured Cap</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 p-2 rounded-lg bg-[#0B0F17] border border-white/5 cursor-pointer hover:bg-white/5">
+                    <input
+                      type="checkbox"
+                      checked={prodIsNewArrival}
+                      onChange={(e) => setProdIsNewArrival(e.target.checked)}
+                      className="rounded text-blue-600 focus:ring-0"
+                    />
+                    <span className="font-mono text-[11px] text-emerald-400">New Drop</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 p-2 rounded-lg bg-[#0B0F17] border border-white/5 cursor-pointer hover:bg-white/5">
+                    <input
+                      type="checkbox"
+                      checked={prodIsBestSeller}
+                      onChange={(e) => setProdIsBestSeller(e.target.checked)}
+                      className="rounded text-blue-600 focus:ring-0"
+                    />
+                    <span className="font-mono text-[11px] text-amber-400">Best Seller</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 p-2 rounded-lg bg-[#0B0F17] border border-white/5 cursor-pointer hover:bg-white/5">
+                    <input
+                      type="checkbox"
+                      checked={prodIsLimited}
+                      onChange={(e) => setProdIsLimited(e.target.checked)}
+                      className="rounded text-blue-600 focus:ring-0"
+                    />
+                    <span className="font-mono text-[11px] text-purple-400">Limited Run</span>
+                  </label>
+                </div>
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
+              {/* Section 4: Headwear Specifications (Collapsible) */}
+              <div className="border border-white/10 rounded-xl overflow-hidden bg-[#151D2C]">
+                <button
+                  type="button"
+                  onClick={() => setShowAdvancedSpecs(!showAdvancedSpecs)}
+                  className="w-full px-4 py-3 flex items-center justify-between text-left font-mono text-xs text-gray-300 hover:text-white transition-colors"
+                >
+                  <span className="font-semibold">
+                    Headwear Specs & Craftsmanship {showAdvancedSpecs ? '(Expanded)' : '(Click to customize)'}
+                  </span>
+                  {showAdvancedSpecs ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
+                </button>
+
+                {showAdvancedSpecs && (
+                  <div className="p-4 border-t border-white/10 space-y-3 bg-[#0B0F17]/50">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-gray-400 font-mono block mb-1 text-[11px]">Fabric / Material</label>
+                        <input
+                          type="text"
+                          value={prodMaterial}
+                          onChange={(e) => setProdMaterial(e.target.value)}
+                          placeholder="e.g. 100% Heavy Brushed Twill"
+                          className="w-full px-3 py-2 bg-[#182232] border border-white/10 rounded-lg text-white font-mono text-xs"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-gray-400 font-mono block mb-1 text-[11px]">Crown Structure</label>
+                        <input
+                          type="text"
+                          value={prodCrown}
+                          onChange={(e) => setProdCrown(e.target.value)}
+                          placeholder="e.g. Structured 6-Panel Mid-Profile"
+                          className="w-full px-3 py-2 bg-[#182232] border border-white/10 rounded-lg text-white font-mono text-xs"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-gray-400 font-mono block mb-1 text-[11px]">Visor / Brim</label>
+                        <input
+                          type="text"
+                          value={prodVisor}
+                          onChange={(e) => setProdVisor(e.target.value)}
+                          placeholder="e.g. Permacurv Memory Visor"
+                          className="w-full px-3 py-2 bg-[#182232] border border-white/10 rounded-lg text-white font-mono text-xs"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-gray-400 font-mono block mb-1 text-[11px]">Closure Type</label>
+                        <input
+                          type="text"
+                          value={prodClosure}
+                          onChange={(e) => setProdClosure(e.target.value)}
+                          placeholder="e.g. Adjustable Antiqued Brass Buckle"
+                          className="w-full px-3 py-2 bg-[#182232] border border-white/10 rounded-lg text-white font-mono text-xs"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-gray-400 font-mono block mb-1 text-[11px]">Workshop / Origin</label>
+                      <input
+                        type="text"
+                        value={prodOrigin}
+                        onChange={(e) => setProdOrigin(e.target.value)}
+                        placeholder="e.g. Crafted in Roxas, Oriental Mindoro"
+                        className="w-full px-3 py-2 bg-[#182232] border border-white/10 rounded-lg text-white font-mono text-xs"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Modal Sticky Bottom Action Bar */}
+              <div className="sticky bottom-0 -mx-5 sm:-mx-7 -mb-5 sm:-mb-7 p-4 sm:p-5 bg-[#0F172A] border-t border-white/10 flex items-center justify-between gap-3 backdrop-blur-md">
                 <button
                   type="button"
                   onClick={() => setProductModalOpen(false)}
-                  className="px-5 py-2.5 bg-white/5 hover:bg-white/10 text-gray-300 rounded-lg text-xs font-semibold"
+                  className="tap-active px-5 py-2.5 bg-white/5 hover:bg-white/10 text-gray-300 rounded-xl text-xs font-semibold transition-colors"
                 >
                   Cancel
                 </button>
-                <button
-                  type="submit"
-                  className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold uppercase tracking-wider"
-                >
-                  {editingProduct ? 'Update Cap' : 'Publish Cap to Store'}
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="submit"
+                    className="tap-active px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-semibold uppercase tracking-wider shadow-lg shadow-blue-600/20 transition-all flex items-center gap-2"
+                  >
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>{editingProduct ? 'Update Cap' : 'Publish Cap to Store'}</span>
+                  </button>
+                </div>
               </div>
             </form>
           </div>

@@ -3,7 +3,6 @@ import { useShop } from '../context/ShopContext';
 import {
   CheckCircle2,
   Printer,
-  Truck,
   ArrowRight,
   ShieldCheck,
   ShoppingBag
@@ -32,11 +31,6 @@ export const OrderConfirmationPage: React.FC = () => {
     window.print();
   };
 
-  const handleTrackOrder = () => {
-    setCurrentPage('order-tracking');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8 print:p-0 print:m-0 print:max-w-none">
       {/* Success Hero Header */}
@@ -57,11 +51,14 @@ export const OrderConfirmationPage: React.FC = () => {
         {/* Quick Action Buttons */}
         <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
           <button
-            onClick={handleTrackOrder}
+            onClick={() => {
+              setCurrentPage('order-history');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
             className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold uppercase tracking-wider rounded-lg transition-colors flex items-center gap-2 shadow-lg shadow-blue-600/20"
           >
-            <Truck className="w-4 h-4" />
-            <span>Track Live Shipment</span>
+            <ShoppingBag className="w-4 h-4" />
+            <span>View My Orders</span>
           </button>
           <button
             onClick={handlePrint}
@@ -140,7 +137,7 @@ export const OrderConfirmationPage: React.FC = () => {
                     <img
                       src={item.productImage}
                       alt={item.productName}
-                      className="w-10 h-10 object-cover rounded bg-black/40 print:hidden"
+                      className="w-10 h-10 object-contain p-0.5 rounded bg-black/40 print:hidden"
                     />
                     <span className="font-semibold text-white print:text-black">{item.productName}</span>
                   </td>

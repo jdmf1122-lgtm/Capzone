@@ -1,0 +1,56 @@
+{
+  "name": "CapZone - Headwear & Streetwear",
+  "short_name": "CapZone",
+  "description": "Roxas, Oriental Mindoro's Premier Caps & Streetwear Mobile App. Same-day local rider delivery & Paclasan studio pickup.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0B0F17",
+  "theme_color": "#0B0F17",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["shopping", "lifestyle"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Shop All Caps",
+      "short_name": "Shop",
+      "description": "Browse premium baseball caps, snapbacks & bucket hats",
+      "url": "/?tab=shop",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "My Shopping Bag",
+      "short_name": "Bag",
+      "description": "View cart and instant checkout",
+      "url": "/?tab=cart",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Track Local Order",
+      "short_name": "Track",
+      "description": "Track Roxas barangay rider delivery status",
+      "url": "/?tab=track",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

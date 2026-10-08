@@ -7,11 +7,14 @@ import React from 'react';
 import { AuthProvider } from './context/AuthContext';
 import { ShopProvider, useShop } from './context/ShopContext';
 import { TopBanner } from './components/layout/TopBanner';
+import { AdminViewBar } from './components/layout/AdminViewBar';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
 import { CartDrawer } from './components/common/CartDrawer';
 import { ToastContainer } from './components/common/Toast';
 import { AuthModal } from './components/common/AuthModal';
+import { MobileBottomNav } from './components/layout/MobileBottomNav';
+import { PwaInstallPrompt } from './components/common/PwaInstallPrompt';
 
 import { HomePage } from './pages/HomePage';
 import { ShopPage } from './pages/ShopPage';
@@ -20,7 +23,6 @@ import { ProductDetailPage } from './pages/ProductDetailPage';
 import { CartPage } from './pages/CartPage';
 import { CheckoutPage } from './pages/CheckoutPage';
 import { OrderConfirmationPage } from './pages/OrderConfirmationPage';
-import { OrderTrackingPage } from './pages/OrderTrackingPage';
 import { OrderHistoryPage } from './pages/OrderHistoryPage';
 import { UserProfilePage } from './pages/UserProfilePage';
 import { LoginPage } from './pages/LoginPage';
@@ -49,7 +51,6 @@ const AppContent: React.FC = () => {
       case 'order-confirmation':
         return <OrderConfirmationPage />;
       case 'order-tracking':
-        return <OrderTrackingPage />;
       case 'order-history':
         return <OrderHistoryPage />;
       case 'user-profile':
@@ -72,14 +73,17 @@ const AppContent: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col bg-[#0B0F17] text-white">
       <TopBanner />
+      <AdminViewBar />
       <Navbar />
-      <main className="flex-1">
+      <main className="flex-1 pb-20 md:pb-0">
         {renderPage()}
       </main>
       <Footer />
       <CartDrawer />
       <ToastContainer />
       <AuthModal />
+      <MobileBottomNav />
+      <PwaInstallPrompt />
     </div>
   );
 };

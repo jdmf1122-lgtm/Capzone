@@ -4,13 +4,12 @@ import { useAuth } from '../context/AuthContext';
 import {
   Package,
   ArrowRight,
-  Truck,
   FileText,
   Clock
 } from 'lucide-react';
 
 export const OrderHistoryPage: React.FC = () => {
-  const { orders, setCurrentPage, setOrderConfirmationId, getOrderByTracking } = useShop();
+  const { orders, setCurrentPage, setOrderConfirmationId } = useShop();
   const { currentUser } = useAuth();
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
@@ -27,12 +26,6 @@ export const OrderHistoryPage: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleTrackShipment = (trackingNumber: string) => {
-    getOrderByTracking(trackingNumber);
-    setCurrentPage('order-tracking');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
       {/* Header */}
@@ -45,7 +38,7 @@ export const OrderHistoryPage: React.FC = () => {
             Order History
           </h1>
           <p className="text-xs sm:text-sm text-gray-400 mt-1">
-            Review past headwear purchases, inspect tracking timelines, and download digital invoices.
+            Review past headwear purchases and download digital receipts and invoices.
           </p>
         </div>
 
@@ -119,7 +112,7 @@ export const OrderHistoryPage: React.FC = () => {
                     <img
                       src={item.productImage}
                       alt={item.productName}
-                      className="w-14 h-14 object-cover rounded bg-black/40 border border-white/10 shrink-0"
+                      className="w-14 h-14 object-contain p-0.5 rounded bg-black/40 border border-white/10 shrink-0"
                     />
                     <div className="min-w-0">
                       <p className="text-xs font-bold text-white truncate">{item.productName}</p>
@@ -148,19 +141,11 @@ export const OrderHistoryPage: React.FC = () => {
 
                 <div className="flex items-center gap-2 w-full sm:w-auto">
                   <button
-                    onClick={() => handleTrackShipment(order.trackingNumber)}
-                    className="flex-1 sm:flex-none px-4 py-2 bg-blue-600/20 hover:bg-blue-600 hover:text-white text-blue-400 border border-blue-500/30 rounded-lg text-xs font-mono font-semibold transition-colors flex items-center justify-center gap-1.5"
-                  >
-                    <Truck className="w-3.5 h-3.5" />
-                    <span>Track</span>
-                  </button>
-
-                  <button
                     onClick={() => handleViewReceipt(order.id)}
-                    className="flex-1 sm:flex-none px-4 py-2 bg-[#182232] hover:bg-white/10 text-gray-200 border border-white/10 rounded-lg text-xs font-mono font-semibold transition-colors flex items-center justify-center gap-1.5"
+                    className="flex-1 sm:flex-none px-4 py-2 bg-blue-600/20 hover:bg-blue-600 hover:text-white text-blue-300 border border-blue-500/30 rounded-lg text-xs font-mono font-semibold transition-colors flex items-center justify-center gap-1.5 shadow-sm"
                   >
                     <FileText className="w-3.5 h-3.5" />
-                    <span>View Invoice</span>
+                    <span>View Receipt & Invoice</span>
                   </button>
                 </div>
               </div>

@@ -10,7 +10,9 @@ import {
   Truck,
   Tag,
   ShieldCheck,
-  RotateCcw
+  RotateCcw,
+  Shield,
+  ShieldAlert
 } from 'lucide-react';
 
 export const CartPage: React.FC = () => {
@@ -140,7 +142,7 @@ export const CartPage: React.FC = () => {
                 <img
                   src={item.image}
                   alt={item.name}
-                  className="w-20 h-20 object-cover rounded-lg bg-black/40 border border-white/10 shrink-0"
+                  className="w-20 h-20 object-contain p-1 rounded-lg bg-black/40 border border-white/10 shrink-0"
                 />
                 <div className="min-w-0">
                   <span className="text-[10px] font-mono uppercase tracking-wider text-blue-400 block">
@@ -280,22 +282,47 @@ export const CartPage: React.FC = () => {
             </div>
 
             {/* Checkout Action Button */}
-            <button
-              onClick={() => {
-                if (!currentUser) {
-                  showToast('Kailangan munang mag-sign in o mag-register bago mag-checkout.', 'error');
-                  setAuthModalReason('checkout');
-                  setIsAuthModalOpen(true);
-                  return;
-                }
-                setCurrentPage('checkout');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-              className="w-full flex items-center justify-center gap-2 py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-colors shadow-lg shadow-blue-600/30"
-            >
-              <span>Proceed to Checkout</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
+            {currentUser?.role === 'admin' ? (
+              <div className="space-y-3">
+                <div className="p-3.5 bg-amber-950/60 border border-amber-500/30 rounded-xl text-xs text-amber-200 flex items-start gap-2.5">
+                  <ShieldAlert className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-bold text-amber-300">Admin Point of View</p>
+                    <p className="text-[11px] text-amber-200/80 mt-0.5 leading-relaxed">
+                      Store owners and administrators cannot purchase store products. Checkout is disabled for admin accounts.
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => {
+                    setCurrentPage('admin');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className="w-full flex items-center justify-center gap-2 py-4 bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs uppercase tracking-wider rounded-xl transition-colors shadow-lg shadow-amber-950/40"
+                >
+                  <Shield className="w-4 h-4" />
+                  <span>Go to Admin Dashboard</span>
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => {
+                  if (!currentUser) {
+                    showToast('Please sign in or create an account before proceeding to checkout.', 'error');
+                    setAuthModalReason('checkout');
+                    setIsAuthModalOpen(true);
+                    return;
+                  }
+                  setCurrentPage('checkout');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="w-full flex items-center justify-center gap-2 py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-colors shadow-lg shadow-blue-600/30"
+              >
+                <span>Proceed to Checkout</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            )}
 
             <div className="pt-2 flex items-center justify-center gap-2 text-[10px] text-gray-500">
               <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />

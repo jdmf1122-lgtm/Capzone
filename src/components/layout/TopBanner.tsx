@@ -17,8 +17,19 @@ export const TopBanner: React.FC = () => {
     <div className="relative z-40 bg-gradient-to-r from-blue-900/60 via-[#111827] to-blue-900/60 border-b border-white/5 py-1.5 px-4 text-xs text-gray-300">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex-1 flex items-center justify-center gap-2 text-center truncate">
-          <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0 hidden sm:inline" />
-          <span className="truncate">
+          <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+          {/* Mobile concise banner */}
+          <span className="sm:hidden text-[11px] truncate">
+            Roxas, Or. Mindoro · 10% OFF code{' '}
+            <button
+              onClick={handleCopyCode}
+              className="text-amber-400 font-mono font-bold underline cursor-pointer"
+            >
+              CAPZONE10
+            </button>
+          </span>
+          {/* Desktop full banner */}
+          <span className="hidden sm:inline truncate">
             <strong className="text-white font-medium">Exclusively Serving Roxas, Oriental Mindoro:</strong> Same-Day Delivery across all 20 Roxas Barangays · Studio Pickup at Paclasan · Code{' '}
             <button
               onClick={handleCopyCode}

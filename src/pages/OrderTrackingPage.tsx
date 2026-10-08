@@ -200,7 +200,7 @@ export const OrderTrackingPage: React.FC = () => {
                   <img
                     src={item.productImage}
                     alt={item.productName}
-                    className="w-14 h-14 object-cover rounded-md bg-black/40 border border-white/10 shrink-0"
+                    className="w-14 h-14 object-contain p-0.5 rounded-md bg-black/40 border border-white/10 shrink-0"
                   />
                   <div className="min-w-0">
                     <p className="text-xs font-semibold text-white truncate">{item.productName}</p>
