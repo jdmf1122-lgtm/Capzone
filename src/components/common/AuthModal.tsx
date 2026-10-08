@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useShop } from '../../context/ShopContext';
-import { X, LogIn, UserPlus, ShieldAlert, Sparkles, UserCheck, Lock } from 'lucide-react';
+import { X, LogIn, UserPlus, ShieldAlert, Sparkles, UserCheck, Lock, Eye, EyeOff } from 'lucide-react';
 import { ROXAS_BARANGAYS } from '../../data/roxasBarangays';
 
 export const AuthModal: React.FC = () => {
@@ -22,12 +22,14 @@ export const AuthModal: React.FC = () => {
   // Login form state
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [loginError, setLoginError] = useState('');
 
   // Register form state
   const [regFullname, setRegFullname] = useState('');
   const [regEmail, setRegEmail] = useState('');
   const [regPassword, setRegPassword] = useState('');
+  const [showRegPassword, setShowRegPassword] = useState(false);
   const [regPhone, setRegPhone] = useState('');
   const [regBarangay, setRegBarangay] = useState<string>(ROXAS_BARANGAYS[0]);
   const [regStreet, setRegStreet] = useState('');
@@ -41,6 +43,8 @@ export const AuthModal: React.FC = () => {
     setPendingAuthAction(null);
     setLoginError('');
     setRegError('');
+    setShowLoginPassword(false);
+    setShowRegPassword(false);
   };
 
   const handleLoginSubmit = (e: React.FormEvent) => {
@@ -48,9 +52,9 @@ export const AuthModal: React.FC = () => {
     setLoginError('');
     const res = login(loginEmail, loginPassword);
     if (!res.success) {
-      setLoginError(res.message || 'Maling email o password.');
+      setLoginError(res.message || 'Invalid email or password.');
     } else {
-      showToast('Matagumpay na naka-sign in!', 'success');
+      showToast('Successfully signed in!', 'success');
       executePendingAuthAction();
     }
   };
@@ -59,7 +63,7 @@ export const AuthModal: React.FC = () => {
     setLoginError('');
     const res = login('juan.delacruz@example.com', 'password123');
     if (res.success) {
-      showToast('Naka-sign in bilang Juan dela Cruz (Customer)', 'success');
+      showToast('Signed in as Juan dela Cruz (Customer)', 'success');
       executePendingAuthAction();
     }
   };
@@ -68,7 +72,7 @@ export const AuthModal: React.FC = () => {
     setLoginError('');
     const res = login('admin@capzone.ph', 'adminpassword');
     if (res.success) {
-      showToast('Naka-sign in bilang Admin', 'success');
+      showToast('Signed in as Admin', 'success');
       executePendingAuthAction();
     }
   };
@@ -78,7 +82,7 @@ export const AuthModal: React.FC = () => {
     setRegError('');
 
     if (regPassword.length < 6) {
-      setRegError('Ang password ay dapat hindi bababa sa 6 na karakter.');
+      setRegError('Password must be at least 6 characters long.');
       return;
     }
 
@@ -96,19 +100,19 @@ export const AuthModal: React.FC = () => {
     });
 
     if (!res.success) {
-      setRegError(res.message || 'Nabigo ang pagrehistro.');
+      setRegError(res.message || 'Registration failed.');
     } else {
-      showToast('Maligayang pagdating! Matagumpay ang paglikha ng iyong account.', 'success');
+      showToast('Welcome! Your account has been created successfully.', 'success');
       executePendingAuthAction();
     }
   };
 
   const reasonMessage =
     authModalReason === 'order'
-      ? 'Kailangan munang mag-sign in o mag-register bago makapag-order.'
+      ? 'Please sign in or register before placing an order.'
       : authModalReason === 'cart'
-      ? 'Kailangan munang mag-sign in o mag-register bago makapag-add to cart.'
-      : 'Kailangan munang mag-sign in o mag-register bago makapag-checkout.';
+      ? 'Please sign in or register before adding items to cart.'
+      : 'Please sign in or register before checking out.';
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
@@ -135,14 +139,14 @@ export const AuthModal: React.FC = () => {
                   {reasonMessage}
                 </p>
                 <p className="text-[11px] text-gray-400 mt-0.5">
-                  Hindi makaka-order o add to cart hangga&apos;t walang account.
+                  An account is required to place an order or add items to cart.
                 </p>
               </div>
             </div>
             <button
               onClick={handleClose}
               className="p-1 text-gray-400 hover:text-white rounded-lg hover:bg-white/5 transition-colors shrink-0"
-              aria-label="Isara"
+              aria-label="Close"
             >
               <X className="w-5 h-5" />
             </button>
@@ -161,7 +165,7 @@ export const AuthModal: React.FC = () => {
             }`}
           >
             <LogIn className="w-3.5 h-3.5" />
-            <span>Mag-Sign In</span>
+            <span>Sign In</span>
           </button>
           <button
             type="button"
@@ -173,7 +177,7 @@ export const AuthModal: React.FC = () => {
             }`}
           >
             <UserPlus className="w-3.5 h-3.5" />
-            <span>Mag-Register</span>
+            <span>Register</span>
           </button>
         </div>
 
@@ -193,7 +197,7 @@ export const AuthModal: React.FC = () => {
                   <input
                     type="email"
                     required
-                    placeholder="ilagay ang inyong email"
+                    placeholder="Enter your email"
                     value={loginEmail}
                     onChange={(e) => setLoginEmail(e.target.value)}
                     className="w-full px-3.5 py-2.5 bg-[#182232] border border-white/10 rounded-lg text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 font-mono"
@@ -202,14 +206,29 @@ export const AuthModal: React.FC = () => {
 
                 <div>
                   <label className="text-xs font-mono text-gray-400 block mb-1">Password</label>
-                  <input
-                    type="password"
-                    required
-                    placeholder="••••••••"
-                    value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-[#182232] border border-white/10 rounded-lg text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 font-mono"
-                  />
+                  <div className="relative">
+                    <input
+                      type={showLoginPassword ? 'text' : 'password'}
+                      required
+                      placeholder="••••••••"
+                      value={loginPassword}
+                      onChange={(e) => setLoginPassword(e.target.value)}
+                      className="w-full pl-3.5 pr-10 py-2.5 bg-[#182232] border border-white/10 rounded-lg text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 font-mono"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowLoginPassword((prev) => !prev)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors focus:outline-none"
+                      aria-label={showLoginPassword ? 'Hide password' : 'Show password'}
+                      title={showLoginPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showLoginPassword ? (
+                        <EyeOff className="w-4 h-4 text-gray-300" />
+                      ) : (
+                        <Eye className="w-4 h-4 text-gray-400 hover:text-white" />
+                      )}
+                    </button>
+                  </div>
                 </div>
 
                 <button
@@ -217,14 +236,14 @@ export const AuthModal: React.FC = () => {
                   className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold uppercase tracking-wider transition-colors shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2"
                 >
                   <LogIn className="w-4 h-4" />
-                  <span>Sign In at Magpatuloy</span>
+                  <span>Sign In & Continue</span>
                 </button>
               </form>
 
               {/* Fast 1-Click Demo Logins for Quick Testing */}
               <div className="pt-3 border-t border-white/10 space-y-2">
                 <span className="text-[10px] uppercase font-mono tracking-wider text-gray-500 block">
-                  Subukan Gamit ang Demo Accounts:
+                  Try Demo Accounts:
                 </span>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <button
@@ -267,11 +286,11 @@ export const AuthModal: React.FC = () => {
 
               <form onSubmit={handleRegisterSubmit} className="space-y-3">
                 <div>
-                  <label className="text-xs font-mono text-gray-400 block mb-1">Buong Pangalan *</label>
+                  <label className="text-xs font-mono text-gray-400 block mb-1">Full Name *</label>
                   <input
                     type="text"
                     required
-                    placeholder="Hal. Maria Santos"
+                    placeholder="e.g. Maria Santos"
                     value={regFullname}
                     onChange={(e) => setRegFullname(e.target.value)}
                     className="w-full px-3.5 py-2 bg-[#182232] border border-white/10 rounded-lg text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
@@ -283,7 +302,7 @@ export const AuthModal: React.FC = () => {
                   <input
                     type="email"
                     required
-                    placeholder="maria@example.ph"
+                    placeholder="maria@example.com"
                     value={regEmail}
                     onChange={(e) => setRegEmail(e.target.value)}
                     className="w-full px-3.5 py-2 bg-[#182232] border border-white/10 rounded-lg text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 font-mono"
@@ -293,18 +312,33 @@ export const AuthModal: React.FC = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   <div>
                     <label className="text-xs font-mono text-gray-400 block mb-1">Password *</label>
-                    <input
-                      type="password"
-                      required
-                      placeholder="Minimum 6 chars"
-                      value={regPassword}
-                      onChange={(e) => setRegPassword(e.target.value)}
-                      className="w-full px-3.5 py-2 bg-[#182232] border border-white/10 rounded-lg text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 font-mono"
-                    />
+                    <div className="relative">
+                      <input
+                        type={showRegPassword ? 'text' : 'password'}
+                        required
+                        placeholder="Minimum 6 chars"
+                        value={regPassword}
+                        onChange={(e) => setRegPassword(e.target.value)}
+                        className="w-full pl-3.5 pr-10 py-2 bg-[#182232] border border-white/10 rounded-lg text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 font-mono"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowRegPassword((prev) => !prev)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors focus:outline-none"
+                        aria-label={showRegPassword ? 'Hide password' : 'Show password'}
+                        title={showRegPassword ? 'Hide password' : 'Show password'}
+                      >
+                        {showRegPassword ? (
+                          <EyeOff className="w-4 h-4 text-gray-300" />
+                        ) : (
+                          <Eye className="w-4 h-4 text-gray-400 hover:text-white" />
+                        )}
+                      </button>
+                    </div>
                   </div>
 
                   <div>
-                    <label className="text-xs font-mono text-gray-400 block mb-1">Mobile / Telepono</label>
+                    <label className="text-xs font-mono text-gray-400 block mb-1">Mobile / Phone Number</label>
                     <input
                       type="tel"
                       placeholder="0917 123 4567"
@@ -317,7 +351,7 @@ export const AuthModal: React.FC = () => {
 
                 <div>
                   <label className="text-xs font-mono text-gray-400 block mb-1">
-                    Barangay sa Roxas, Oriental Mindoro *
+                    Barangay in Roxas, Oriental Mindoro *
                   </label>
                   <select
                     value={regBarangay}
@@ -334,11 +368,11 @@ export const AuthModal: React.FC = () => {
 
                 <div>
                   <label className="text-xs font-mono text-gray-400 block mb-1">
-                    Kalye / Purok / House No.
+                    Street / Purok / House No.
                   </label>
                   <input
                     type="text"
-                    placeholder="Hal. Rizal St. o Purok 3"
+                    placeholder="e.g. Rizal St. or Purok 3"
                     value={regStreet}
                     onChange={(e) => setRegStreet(e.target.value)}
                     className="w-full px-3.5 py-2 bg-[#182232] border border-white/10 rounded-lg text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
@@ -350,7 +384,7 @@ export const AuthModal: React.FC = () => {
                   className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold uppercase tracking-wider transition-colors shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 mt-2"
                 >
                   <UserPlus className="w-4 h-4" />
-                  <span>Mag-rehistro at Magpatuloy</span>
+                  <span>Register & Continue</span>
                 </button>
               </form>
             </div>

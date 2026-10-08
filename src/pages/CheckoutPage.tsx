@@ -12,7 +12,9 @@ import {
   Banknote,
   Lock,
   LogIn,
-  Shield
+  Shield,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 
 import { ROXAS_BARANGAYS } from '../data/roxasBarangays';
@@ -50,6 +52,7 @@ export const CheckoutPage: React.FC = () => {
   const [cardNumber, setCardNumber] = useState('4532 •••• •••• 8821');
   const [cardExpiry, setCardExpiry] = useState('08/28');
   const [cardCvc, setCardCvc] = useState('389');
+  const [showCvc, setShowCvc] = useState(false);
 
   // GCash / Maya state
   const [ewalletPhone, setEwalletPhone] = useState('0917 555 4321');
@@ -494,13 +497,28 @@ export const CheckoutPage: React.FC = () => {
                   </div>
                   <div>
                     <label className="text-[11px] font-mono text-gray-400 block mb-1">CVC Code</label>
-                    <input
-                      type="password"
-                      maxLength={4}
-                      value={cardCvc}
-                      onChange={(e) => setCardCvc(e.target.value)}
-                      className="w-full px-3 py-2 bg-[#0B0F17] border border-white/10 rounded-lg text-xs text-white font-mono"
-                    />
+                    <div className="relative">
+                      <input
+                        type={showCvc ? 'text' : 'password'}
+                        maxLength={4}
+                        value={cardCvc}
+                        onChange={(e) => setCardCvc(e.target.value)}
+                        className="w-full pl-3 pr-8 py-2 bg-[#0B0F17] border border-white/10 rounded-lg text-xs text-white font-mono"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowCvc((prev) => !prev)}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 text-gray-400 hover:text-white transition-colors focus:outline-none"
+                        aria-label={showCvc ? 'Hide CVC' : 'Show CVC'}
+                        title={showCvc ? 'Hide CVC' : 'Show CVC'}
+                      >
+                        {showCvc ? (
+                          <EyeOff className="w-3.5 h-3.5 text-gray-300" />
+                        ) : (
+                          <Eye className="w-3.5 h-3.5 text-gray-400 hover:text-white" />
+                        )}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

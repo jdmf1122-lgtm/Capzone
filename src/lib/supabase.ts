@@ -155,7 +155,7 @@ export async function testSupabaseConnection(): Promise<ConnectionTestResult> {
       ) {
         return {
           connected: true,
-          message: 'Konektado sa Supabase, ngunit kailangan munang patakbuhin ang SQL Schema sa Supabase SQL Editor para magawa ang mga tables.',
+          message: 'Connected to Supabase, but you need to run the SQL Schema in the Supabase SQL Editor first to create the tables.',
           url
         };
       }
@@ -177,7 +177,7 @@ export async function testSupabaseConnection(): Promise<ConnectionTestResult> {
 
     return {
       connected: true,
-      message: 'Matagumpay na nakakonekta sa Supabase database!',
+      message: 'Successfully connected to the Supabase database!',
       url,
       tables: {
         products: productCount ?? 0,
@@ -779,7 +779,7 @@ export async function seedInitialDataToSupabase(): Promise<{
 
     return {
       success: true,
-      message: 'Lahat ng initial data (products, categories, discounts, reviews, orders, users) ay matagumpay na nai-upload sa Supabase!',
+      message: 'All initial data (products, categories, discounts, reviews, orders, users) was successfully uploaded to Supabase!',
       counts: {
         products: prodPayloads.length,
         categories: catPayloads.length,

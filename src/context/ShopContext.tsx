@@ -417,7 +417,7 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!isSupabaseConfigured()) {
       return {
         success: false,
-        message: 'Kailangan munang ilagay ang Supabase Project URL at Anon Public Key.'
+        message: 'Please provide the Supabase Project URL and Anon Public Key first.'
       };
     }
 
@@ -427,7 +427,7 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (res.success) {
         await refreshFromDatabase();
         setIsSupabaseConnected(true);
-        showToast('Nai-upload ang initial data sa Supabase!', 'success');
+        showToast('Initial data successfully uploaded to Supabase!', 'success');
       }
       return res;
     } catch (err: any) {

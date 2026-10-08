@@ -975,7 +975,7 @@ export const AdminDashboardPage: React.FC = () => {
                 </h2>
 
                 <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
-                  Ang CapZone ay naka-integrate sa <strong className="text-emerald-400 font-semibold">Supabase</strong> — isang open-source PostgreSQL database. Lahat ng mga produkto, kategorya, orders, reviews, discount vouchers, at mga customer accounts ay pwedeng i-save at i-sync nang diretso sa iyong Supabase project.
+                  CapZone is integrated with <strong className="text-emerald-400 font-semibold">Supabase</strong> — an open-source PostgreSQL database. All products, categories, orders, reviews, discount vouchers, and customer accounts can be saved and synced directly to your Supabase project.
                 </p>
               </div>
 
