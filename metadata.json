@@ -1,0 +1,6 @@
+{
+  "name": "CapZone",
+  "description": "CapZone - Top Off Your Style. Premium streetwear and headwear e-commerce store dedicated exclusively to selling caps and hats around Roxas, Oriental Mindoro (PHP ₱). Local express delivery across all 20 Roxas barangays.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
