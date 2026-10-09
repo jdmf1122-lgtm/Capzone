@@ -49,7 +49,7 @@ export const ContactUsPage: React.FC = () => {
     },
     {
       q: 'What payment methods do you accept?',
-      a: 'We accept Cash on Delivery (COD), GCash, and Visa/Mastercard credit/debit cards in Philippine Peso (₱ PHP). Digital payments are encrypted and validated in real time.'
+      a: 'We accept Cash on Delivery (COD) and GCash in Philippine Peso (₱ PHP). Digital payments are encrypted and validated in real time.'
     },
     {
       q: 'What is your return or exchange policy?',

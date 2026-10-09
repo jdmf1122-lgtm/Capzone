@@ -141,11 +141,8 @@ export const Footer: React.FC = () => {
               <div className="p-2 bg-[#182232] rounded border border-white/5 text-center text-blue-400 font-bold">
                 GCash
               </div>
-              <div className="p-2 bg-[#182232] rounded border border-white/5 text-center text-gray-300">
-                Visa / MC
-              </div>
-              <div className="p-2 col-span-2 bg-[#182232] rounded border border-white/5 text-center text-gray-300">
-                Cash on Delivery (COD)
+              <div className="p-2 bg-[#182232] rounded border border-white/5 text-center text-amber-400 font-bold">
+                Cash on Delivery
               </div>
             </div>
 

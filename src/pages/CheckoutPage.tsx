@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { PaymentMethod } from '../types';
 import {
   ShieldCheck,
-  CreditCard,
+  Wallet,
   Truck,
   Check,
   ArrowLeft,
@@ -13,8 +13,11 @@ import {
   Lock,
   LogIn,
   Shield,
-  Eye,
-  EyeOff
+  QrCode,
+  Download,
+  Copy,
+  X,
+  Maximize2
 } from 'lucide-react';
 
 import { ROXAS_BARANGAYS } from '../data/roxasBarangays';
@@ -48,14 +51,18 @@ export const CheckoutPage: React.FC = () => {
   // Payment Selection
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('gcash');
 
-  // Card details state
-  const [cardNumber, setCardNumber] = useState('4532 •••• •••• 8821');
-  const [cardExpiry, setCardExpiry] = useState('08/28');
-  const [cardCvc, setCardCvc] = useState('389');
-  const [showCvc, setShowCvc] = useState(false);
-
   // GCash state
   const [ewalletPhone, setEwalletPhone] = useState('0917 555 4321');
+  const [gcashReference, setGcashReference] = useState('');
+  const [isQrModalOpen, setIsQrModalOpen] = useState(false);
+  const [copiedAmount, setCopiedAmount] = useState(false);
+
+  const handleCopyAmount = () => {
+    navigator.clipboard.writeText(totalAmount.toString());
+    setCopiedAmount(true);
+    showToast(`Amount ₱${totalAmount.toLocaleString()} copied to clipboard!`, 'info');
+    setTimeout(() => setCopiedAmount(false), 2000);
+  };
 
   // Submitting state
   const [submitting, setSubmitting] = useState(false);
@@ -176,6 +183,11 @@ export const CheckoutPage: React.FC = () => {
         ? 'In-Store Pickup: CapZone Studio (Rizal St., Barangay Paclasan, Roxas, Oriental Mindoro)'
         : `${streetAddress}, Barangay ${selectedBarangay}, Roxas, Oriental Mindoro`;
 
+    const gcashInfoNote =
+      paymentMethod === 'gcash'
+        ? `[GCASH PAYMENT - Sender: ${ewalletPhone || 'N/A'}${gcashReference.trim() ? ` | Ref No: ${gcashReference.trim()}` : ''}] `
+        : '';
+
     setTimeout(() => {
       createOrder({
         customerName,
@@ -185,7 +197,7 @@ export const CheckoutPage: React.FC = () => {
         city: 'Roxas, Oriental Mindoro',
         postalCode: '5212',
         paymentMethod,
-        notes: `${deliveryType === 'pickup' ? '[STUDIO PICKUP] ' : `[ROXAS LOCAL RIDER - Brgy. ${selectedBarangay}] `}${notes}`,
+        notes: `${deliveryType === 'pickup' ? '[STUDIO PICKUP] ' : `[ROXAS LOCAL RIDER - Brgy. ${selectedBarangay}] `}${gcashInfoNote}${notes}`,
         userId: currentUser?.id
       });
       setSubmitting(false);
@@ -381,10 +393,10 @@ export const CheckoutPage: React.FC = () => {
           {/* 2. Payment Method Selection */}
           <div className="p-6 bg-[#111827] rounded-xl border border-white/10 space-y-5">
             <h2 className="text-sm font-bold uppercase font-mono tracking-wider text-white flex items-center gap-2">
-              <CreditCard className="w-4 h-4 text-blue-400" /> 2. Payment Method
+              <Wallet className="w-4 h-4 text-blue-400" /> 2. Payment Method
             </h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {/* GCash */}
               <div
                 onClick={() => setPaymentMethod('gcash')}
@@ -403,27 +415,6 @@ export const CheckoutPage: React.FC = () => {
                     </div>
                   </div>
                   {paymentMethod === 'gcash' && <Check className="w-4 h-4 text-blue-400" />}
-                </div>
-              </div>
-
-              {/* Credit / Debit Card */}
-              <div
-                onClick={() => setPaymentMethod('card')}
-                className={`p-4 rounded-xl border cursor-pointer transition-all ${
-                  paymentMethod === 'card'
-                    ? 'border-blue-500 bg-blue-500/10'
-                    : 'border-white/10 bg-[#182232] hover:border-white/20'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2.5">
-                    <CreditCard className="w-5 h-5 text-gray-300" />
-                    <div>
-                      <p className="font-bold text-xs text-white">Credit / Debit Card</p>
-                      <p className="text-[10px] text-gray-400 font-mono">Visa, Mastercard, JCB</p>
-                    </div>
-                  </div>
-                  {paymentMethod === 'card' && <Check className="w-4 h-4 text-blue-400" />}
                 </div>
               </div>
 
@@ -449,73 +440,123 @@ export const CheckoutPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Payment Sub-Form Details */}
-            {paymentMethod === 'card' && (
-              <div className="p-4 bg-[#182232] rounded-xl border border-white/5 space-y-3">
-                <span className="text-[11px] font-mono text-gray-400 block uppercase">
-                  Card Information
-                </span>
-                <div>
-                  <label className="text-[11px] font-mono text-gray-400 block mb-1">Card Number</label>
-                  <input
-                    type="text"
-                    value={cardNumber}
-                    onChange={(e) => setCardNumber(e.target.value)}
-                    className="w-full px-3 py-2 bg-[#0B0F17] border border-white/10 rounded-lg text-xs text-white font-mono"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-[11px] font-mono text-gray-400 block mb-1">Expiry Date</label>
-                    <input
-                      type="text"
-                      value={cardExpiry}
-                      onChange={(e) => setCardExpiry(e.target.value)}
-                      className="w-full px-3 py-2 bg-[#0B0F17] border border-white/10 rounded-lg text-xs text-white font-mono"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[11px] font-mono text-gray-400 block mb-1">CVC Code</label>
-                    <div className="relative">
-                      <input
-                        type={showCvc ? 'text' : 'password'}
-                        maxLength={4}
-                        value={cardCvc}
-                        onChange={(e) => setCardCvc(e.target.value)}
-                        className="w-full pl-3 pr-8 py-2 bg-[#0B0F17] border border-white/10 rounded-lg text-xs text-white font-mono"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowCvc((prev) => !prev)}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 text-gray-400 hover:text-white transition-colors focus:outline-none"
-                        aria-label={showCvc ? 'Hide CVC' : 'Show CVC'}
-                        title={showCvc ? 'Hide CVC' : 'Show CVC'}
-                      >
-                        {showCvc ? (
-                          <EyeOff className="w-3.5 h-3.5 text-gray-300" />
-                        ) : (
-                          <Eye className="w-3.5 h-3.5 text-gray-400 hover:text-white" />
-                        )}
-                      </button>
+            {paymentMethod === 'gcash' && (
+              <div className="p-5 bg-[#182232] rounded-xl border border-blue-500/20 space-y-4">
+                {/* QR Header & Merchant Account Info */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-white/10">
+                  <div className="flex items-center gap-2">
+                    <span className="p-1.5 rounded-lg bg-blue-500/20 text-blue-400">
+                      <QrCode className="w-4 h-4" />
+                    </span>
+                    <div>
+                      <h3 className="text-xs font-bold text-white uppercase tracking-wider font-mono">
+                        Scan QR Code to Pay
+                      </h3>
+                      <p className="text-[11px] text-gray-400">
+                        Official CapZone GCash · InstaPay / QR Ph
+                      </p>
                     </div>
                   </div>
+                  <span className="self-start sm:self-auto text-[10px] font-mono uppercase px-2.5 py-1 rounded bg-blue-500/10 text-blue-400 border border-blue-500/30">
+                    Account: Von Jovy
+                  </span>
                 </div>
-              </div>
-            )}
 
-            {paymentMethod === 'gcash' && (
-              <div className="p-4 bg-[#182232] rounded-xl border border-white/5 space-y-2">
-                <span className="text-[11px] font-mono text-gray-400 block uppercase">
-                  GCash Account Number
-                </span>
-                <input
-                  type="tel"
-                  value={ewalletPhone}
-                  onChange={(e) => setEwalletPhone(e.target.value)}
-                  placeholder="09XX XXX XXXX"
-                  className="w-full px-3 py-2 bg-[#0B0F17] border border-white/10 rounded-lg text-xs text-white font-mono"
-                />
-                <p className="text-[10px] text-gray-400">
+                {/* QR Display Card */}
+                <div className="flex flex-col items-center justify-center p-4 bg-[#0B0F17] rounded-xl border border-white/10 space-y-3">
+                  <div
+                    className="relative group cursor-pointer"
+                    onClick={() => setIsQrModalOpen(true)}
+                    title="Click to view full size"
+                  >
+                    <img
+                      src="/assets/images/gcash-qr.jpg"
+                      alt="CapZone GCash QR Code - Von Jovy"
+                      className="w-56 sm:w-64 max-w-full rounded-xl shadow-2xl border border-white/10 transition-transform duration-200 group-hover:scale-[1.02]"
+                    />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center gap-2 text-white text-xs font-mono font-medium backdrop-blur-[2px]">
+                      <Maximize2 className="w-4 h-4" />
+                      <span>Click to Enlarge</span>
+                    </div>
+                  </div>
+
+                  {/* Actions: Download QR & Copy Amount */}
+                  <div className="flex flex-wrap items-center justify-center gap-2 pt-1 w-full max-w-xs">
+                    <a
+                      href="/assets/images/gcash-qr.jpg"
+                      download="CapZone-GCash-QR.jpg"
+                      className="flex-1 min-w-[130px] px-3 py-2 bg-white/10 hover:bg-white/15 text-white rounded-lg text-xs font-mono font-semibold flex items-center justify-center gap-1.5 transition-colors border border-white/10"
+                    >
+                      <Download className="w-3.5 h-3.5 text-blue-400" />
+                      <span>Save QR Image</span>
+                    </a>
+                    <button
+                      type="button"
+                      onClick={handleCopyAmount}
+                      className="flex-1 min-w-[130px] px-3 py-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 rounded-lg text-xs font-mono font-semibold flex items-center justify-center gap-1.5 transition-colors border border-blue-500/30"
+                    >
+                      {copiedAmount ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-emerald-400" />
+                          <span className="text-emerald-400">Copied!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5 text-blue-400" />
+                          <span>Copy ₱{totalAmount.toLocaleString()}</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  <p className="text-[11px] text-gray-400 text-center font-mono pt-1">
+                    Exact Amount to Send: <span className="text-white font-bold text-xs">₱{totalAmount.toLocaleString()} PHP</span>
+                  </p>
+                </div>
+
+                {/* Instructions */}
+                <div className="p-3 bg-[#0e1624] rounded-lg border border-white/5 space-y-1.5 text-[11px] text-gray-300">
+                  <p className="font-semibold text-white flex items-center gap-1.5 font-mono text-[11px]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-400" /> How to Pay via GCash:
+                  </p>
+                  <ol className="list-decimal list-inside space-y-1 text-gray-400 pl-1 leading-relaxed">
+                    <li>Open your <strong className="text-white">GCash App</strong> and tap <strong className="text-white">QR / Scan</strong>. (If using your phone, tap <em>Save QR Image</em> above, then in GCash select <em>Upload QR</em> from gallery).</li>
+                    <li>Send exactly <strong className="text-blue-400 font-mono">₱{totalAmount.toLocaleString()} PHP</strong> to <strong className="text-white">Von Jovy</strong>.</li>
+                    <li>Enter your GCash mobile number and Reference Number below to complete your order.</li>
+                  </ol>
+                </div>
+
+                {/* Sender Inputs */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                  <div>
+                    <label className="text-[11px] font-mono text-gray-400 block mb-1">
+                      Your GCash Mobile Number *
+                    </label>
+                    <input
+                      type="tel"
+                      required
+                      value={ewalletPhone}
+                      onChange={(e) => setEwalletPhone(e.target.value)}
+                      placeholder="09XX XXX XXXX"
+                      className="w-full px-3 py-2 bg-[#0B0F17] border border-white/10 rounded-lg text-xs text-white font-mono focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-mono text-gray-400 block mb-1">
+                      GCash Reference No. (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      value={gcashReference}
+                      onChange={(e) => setGcashReference(e.target.value)}
+                      placeholder="e.g. 1002 9842 1530 1"
+                      className="w-full px-3 py-2 bg-[#0B0F17] border border-white/10 rounded-lg text-xs text-white font-mono focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                </div>
+
+                <p className="text-[10px] text-gray-500 font-mono">
                   Instant secure payment verification token will be generated on order submission.
                 </p>
               </div>
@@ -607,6 +648,59 @@ export const CheckoutPage: React.FC = () => {
           </div>
         </div>
       </form>
+
+      {/* GCash QR Enlarge Modal */}
+      {isQrModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+          onClick={() => setIsQrModalOpen(false)}
+        >
+          <div
+            className="relative bg-[#111827] border border-white/20 rounded-2xl p-5 max-w-sm w-full space-y-4 shadow-2xl text-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between pb-2 border-b border-white/10">
+              <span className="text-xs font-mono font-bold text-white uppercase tracking-wider">
+                GCash QR · Von Jovy
+              </span>
+              <button
+                type="button"
+                onClick={() => setIsQrModalOpen(false)}
+                className="p-1 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+                aria-label="Close QR Modal"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="flex justify-center p-2 bg-[#0B0F17] rounded-xl border border-white/10">
+              <img
+                src="/assets/images/gcash-qr.jpg"
+                alt="CapZone GCash QR Full View"
+                className="max-h-[70vh] w-auto rounded-lg object-contain shadow-lg"
+              />
+            </div>
+
+            <div className="flex gap-2">
+              <a
+                href="/assets/images/gcash-qr.jpg"
+                download="CapZone-GCash-QR.jpg"
+                className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors"
+              >
+                <Download className="w-4 h-4" />
+                <span>Save to Phone</span>
+              </a>
+              <button
+                type="button"
+                onClick={() => setIsQrModalOpen(false)}
+                className="px-4 py-2.5 bg-white/10 hover:bg-white/15 text-gray-300 rounded-xl text-xs font-mono uppercase tracking-wider transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
