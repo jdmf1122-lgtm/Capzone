@@ -138,17 +138,14 @@ export const Footer: React.FC = () => {
               Supported Payments
             </h4>
             <div className="grid grid-cols-2 gap-2 text-[11px] font-mono mb-6">
-              <div className="p-2 bg-[#182232] rounded border border-white/5 text-center text-gray-300">
-                Cash on Del. (COD)
-              </div>
               <div className="p-2 bg-[#182232] rounded border border-white/5 text-center text-blue-400 font-bold">
                 GCash
               </div>
-              <div className="p-2 bg-[#182232] rounded border border-white/5 text-center text-emerald-400 font-bold">
-                Maya
-              </div>
               <div className="p-2 bg-[#182232] rounded border border-white/5 text-center text-gray-300">
                 Visa / MC
+              </div>
+              <div className="p-2 col-span-2 bg-[#182232] rounded border border-white/5 text-center text-gray-300">
+                Cash on Delivery (COD)
               </div>
             </div>
 

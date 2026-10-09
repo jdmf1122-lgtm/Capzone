@@ -54,7 +54,7 @@ export const CheckoutPage: React.FC = () => {
   const [cardCvc, setCardCvc] = useState('389');
   const [showCvc, setShowCvc] = useState(false);
 
-  // GCash / Maya state
+  // GCash state
   const [ewalletPhone, setEwalletPhone] = useState('0917 555 4321');
 
   // Submitting state
@@ -384,7 +384,7 @@ export const CheckoutPage: React.FC = () => {
               <CreditCard className="w-4 h-4 text-blue-400" /> 2. Payment Method
             </h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {/* GCash */}
               <div
                 onClick={() => setPaymentMethod('gcash')}
@@ -403,27 +403,6 @@ export const CheckoutPage: React.FC = () => {
                     </div>
                   </div>
                   {paymentMethod === 'gcash' && <Check className="w-4 h-4 text-blue-400" />}
-                </div>
-              </div>
-
-              {/* Maya */}
-              <div
-                onClick={() => setPaymentMethod('maya')}
-                className={`p-4 rounded-xl border cursor-pointer transition-all ${
-                  paymentMethod === 'maya'
-                    ? 'border-emerald-500 bg-emerald-500/10'
-                    : 'border-white/10 bg-[#182232] hover:border-white/20'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2.5">
-                    <Smartphone className="w-5 h-5 text-emerald-400" />
-                    <div>
-                      <p className="font-bold text-xs text-white">Maya</p>
-                      <p className="text-[10px] text-gray-400 font-mono">Wallet or Maya QR</p>
-                    </div>
-                  </div>
-                  {paymentMethod === 'maya' && <Check className="w-4 h-4 text-emerald-400" />}
                 </div>
               </div>
 
@@ -524,10 +503,10 @@ export const CheckoutPage: React.FC = () => {
               </div>
             )}
 
-            {(paymentMethod === 'gcash' || paymentMethod === 'maya') && (
+            {paymentMethod === 'gcash' && (
               <div className="p-4 bg-[#182232] rounded-xl border border-white/5 space-y-2">
                 <span className="text-[11px] font-mono text-gray-400 block uppercase">
-                  {paymentMethod.toUpperCase()} Account Number
+                  GCash Account Number
                 </span>
                 <input
                   type="tel"

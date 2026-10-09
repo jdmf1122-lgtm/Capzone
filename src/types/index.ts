@@ -87,7 +87,7 @@ export interface OrderItem {
 }
 
 export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-export type PaymentMethod = 'cod' | 'gcash' | 'maya' | 'card';
+export type PaymentMethod = 'cod' | 'gcash' | 'card';
 export type PaymentStatus = 'paid' | 'pending';
 
 export interface TrackingStep {
